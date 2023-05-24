@@ -1,0 +1,31 @@
+import { createApp } from "/node_modules/.vite/deps/vue.js?v=c72bf0a6";
+import VNetworkGraph from "/node_modules/.vite/deps/v-network-graph.js?v=c72bf0a6";
+import "/node_modules/bootstrap/dist/css/bootstrap.css";
+import "/node_modules/v-network-graph/lib/style.css";
+import App from "/src/App.vue";
+import router from "/src/router.ts?t=1680178445182";
+import { createPinia } from "/node_modules/.vite/deps/pinia.js?v=c72bf0a6";
+import "/node_modules/vue-easytable/libs/theme-default/index.css";
+import "/node_modules/vuetify/lib/styles/main.css";
+import { createVuetify } from "/node_modules/.vite/deps/vuetify.js?v=c72bf0a6";
+import * as components from "/node_modules/.vite/deps/vuetify_components.js?v=c72bf0a6";
+import * as directives from "/node_modules/.vite/deps/vuetify_directives.js?v=c72bf0a6";
+import { aliases, fa } from "/node_modules/.vite/deps/vuetify_iconsets_fa4.js?v=c72bf0a6";
+import { mdi } from "/node_modules/.vite/deps/vuetify_iconsets_mdi.js?v=c72bf0a6";
+import "/node_modules/material-design-icons-iconfont/dist/material-design-icons.css";
+const pinia = createPinia();
+const vuetify = createVuetify({
+  icons: {
+    defaultSet: "mdi",
+    aliases,
+    sets: {
+      fa,
+      mdi
+    }
+  },
+  components,
+  directives
+});
+createApp(App).use(router).use(VNetworkGraph).use(pinia).use(vuetify).mount("#app");
+
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIkM6L1VzZXJzL21qLnZhbnN0YWRlbi9EZXZlbG9wbWVudC9WQVNUZWNoL3Z1ZS12ZXJzaW9uLW1hbmFnZXIvdmVyc2lvbi1tYW5hZ2VyL3NyYy9tYWluLnRzIl0sInNvdXJjZXNDb250ZW50IjpbImltcG9ydCB7IGNyZWF0ZUFwcCB9IGZyb20gJ3Z1ZSdcbmltcG9ydCBWTmV0d29ya0dyYXBoIGZyb20gJ3YtbmV0d29yay1ncmFwaCc7XG5pbXBvcnQgXCJib290c3RyYXAvZGlzdC9jc3MvYm9vdHN0cmFwLmNzc1wiXG5pbXBvcnQgXCJ2LW5ldHdvcmstZ3JhcGgvbGliL3N0eWxlLmNzc1wiO1xuaW1wb3J0IEFwcCBmcm9tICcuL0FwcC52dWUnO1xuaW1wb3J0IHJvdXRlciBmcm9tICcuL3JvdXRlcic7XG5pbXBvcnQgeyBjcmVhdGVQaW5pYSB9IGZyb20gJ3BpbmlhJztcbmltcG9ydCBcInZ1ZS1lYXN5dGFibGUvbGlicy90aGVtZS1kZWZhdWx0L2luZGV4LmNzc1wiOyAvLyBpbXBvcnQgc3R5bGVcblxuLy8gVnVldGlmeVxuaW1wb3J0ICd2dWV0aWZ5L3N0eWxlcydcbmltcG9ydCB7IGNyZWF0ZVZ1ZXRpZnkgfSBmcm9tICd2dWV0aWZ5J1xuaW1wb3J0ICogYXMgY29tcG9uZW50cyBmcm9tICd2dWV0aWZ5L2NvbXBvbmVudHMnXG5pbXBvcnQgKiBhcyBkaXJlY3RpdmVzIGZyb20gJ3Z1ZXRpZnkvZGlyZWN0aXZlcydcbi8vIGltcG9ydCB7IGFsaWFzZXMsIGZhIH0gZnJvbSAndnVldGlmeS9pY29uc2V0cy9mYSdcbmltcG9ydCB7IGFsaWFzZXMsIGZhIH0gZnJvbSAndnVldGlmeS9pY29uc2V0cy9mYTQnXG5pbXBvcnQgeyBtZGkgfSBmcm9tICd2dWV0aWZ5L2ljb25zZXRzL21kaSdcbmltcG9ydCAnbWF0ZXJpYWwtZGVzaWduLWljb25zLWljb25mb250L2Rpc3QvbWF0ZXJpYWwtZGVzaWduLWljb25zLmNzcycgXG5cbmNvbnN0IHBpbmlhID0gY3JlYXRlUGluaWEoKTtcblxuY29uc3QgdnVldGlmeSA9IGNyZWF0ZVZ1ZXRpZnkoe1xuICAgIGljb25zOiB7XG4gICAgICAgIGRlZmF1bHRTZXQ6ICdtZGknLFxuICAgICAgICBhbGlhc2VzLFxuICAgICAgICBzZXRzOiB7XG4gICAgICAgICAgICBmYSxcbiAgICAgICAgICAgIG1kaSxcbiAgICAgICAgfSxcbiAgICB9LFxuICAgIGNvbXBvbmVudHMsXG4gICAgZGlyZWN0aXZlcyxcbiAgfSlcblxuY3JlYXRlQXBwKEFwcClcbiAgICAudXNlKHJvdXRlcilcbiAgICAudXNlKFZOZXR3b3JrR3JhcGgpXG4gICAgLnVzZShwaW5pYSlcbiAgICAudXNlKHZ1ZXRpZnkpXG4gICAgLm1vdW50KCcjYXBwJylcblxuXG4iXSwibWFwcGluZ3MiOiJBQUFBLFNBQVMsaUJBQWlCO0FBQzFCLE9BQU8sbUJBQW1CO0FBQzFCLE9BQU87QUFDUCxPQUFPO0FBQ1AsT0FBTyxTQUFTO0FBQ2hCLE9BQU8sWUFBWTtBQUNuQixTQUFTLG1CQUFtQjtBQUM1QixPQUFPO0FBR1AsT0FBTztBQUNQLFNBQVMscUJBQXFCO0FBQzlCLFlBQVksZ0JBQWdCO0FBQzVCLFlBQVksZ0JBQWdCO0FBRTVCLFNBQVMsU0FBUyxVQUFVO0FBQzVCLFNBQVMsV0FBVztBQUNwQixPQUFPO0FBRVAsTUFBTSxRQUFRLFlBQVk7QUFFMUIsTUFBTSxVQUFVLGNBQWM7QUFBQSxFQUMxQixPQUFPO0FBQUEsSUFDSCxZQUFZO0FBQUEsSUFDWjtBQUFBLElBQ0EsTUFBTTtBQUFBLE1BQ0Y7QUFBQSxNQUNBO0FBQUEsSUFDSjtBQUFBLEVBQ0o7QUFBQSxFQUNBO0FBQUEsRUFDQTtBQUNGLENBQUM7QUFFSCxVQUFVLEdBQUcsRUFDUixJQUFJLE1BQU0sRUFDVixJQUFJLGFBQWEsRUFDakIsSUFBSSxLQUFLLEVBQ1QsSUFBSSxPQUFPLEVBQ1gsTUFBTSxNQUFNOyIsIm5hbWVzIjpbXX0=
