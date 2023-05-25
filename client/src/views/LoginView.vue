@@ -25,7 +25,7 @@
                     <input type="checkbox" id="rememberMe" name="rememberMe" v-model="input.rememberMe">
                     <label for="rememberMe">Remember me</label> 
                 </div> -->
-                <button class="login-button" @click="authUser()">Login</button>
+                <button class="login-button" @click="login()">Login</button>
             </div>
             <a @click="moveToRegister()">Need an account?</a>
         </div>
@@ -35,100 +35,57 @@
 
 <script lang="ts">
 import Header from "../components/Login_Header.vue";
-import { pocketbase } from "../lib/pocketbase";
-import { ClientResponseError } from "pocketbase";
 import router from "../router";
+import AuthenticationService from "../services/AuthenticationService";
 
-var componentCount = 0;
-var systemCount = 0;
-let id: string = "";
-let username: string = "";
-let email: string = "";
-let role: string = "";
+export default {
+    name: "Login",
+    data() {
+        return {
+            alert_incorrect: false,
+            error_msg: "",
+            input: {
+                username: "",
+                email: "",
+                password: "",
+                role: "",
+                rememberMe: false,
+            },
+        }
+    },
+    methods: {
+        async login() {
+            try {
+                await AuthenticationService.login({
+                    email: this.input.email,
+                    password: this.input.password,
+                });
+                this.alert_incorrect = false;
+                router.push('/dashboard');
 
-    export default {
-        name: "Login",
-        data() {
-            return {
-                alert_incorrect: false,
-                input: {
-                    username: "",
-                    email: "",
-                    password: "",
-                    role: "",
-                    rememberMe: false,
-                },
+            } catch (error: any) {
+                this.error_msg = error.response.data.error; 
+                this.alert_incorrect = true;
             }
         },
-        methods: {
-            authUser() {
-                if (this.input.email.trim() == "" || this.input.password.trim() == "") {
-                    this.alert_incorrect = true;
-                    return 
-                }
-                const path = 'http://127.0.0.1:5000/login'
-
-                axios.post(path, {
-                    email: this.input.email,
-                    password: this.input.password
-                }).then((response) => {
-                    if (response.data == "success") {
-                        alert("Login Successful");
-                        router.push('/dashboard');
-                        this.$router.push('/dashboard');
-                        return 
-                    } else 
-                        this.alert_incorrect = true;
-                }).catch((error) => {
-                    console.log(error)
-                })
-            },
-            // async authUser () {
-
-            //     console.log(await pocketbase.collection('users').getFullList());
-            
-            //     try {
-            //         const user_login = await pocketbase.collection('users').authWithPassword(this.input.email, this.input.password);  
-            //         id = user_login.record.id;
-            //         username = user_login.record.username;
-            //         email = user_login.record.email;
-            //         role = user_login.record.role;
-            //     } catch (err) {
-                    
-            //     }
-            //     if (pocketbase.authStore.isValid) {
-            //             this.alert_incorrect = false;
-            //             this.$pinia.state.value.user.id  = id;
-            //             this.$pinia.state.value.user.name  = username;
-            //             this.$pinia.state.value.user.email  = email;
-            //             this.$pinia.state.value.user.role  = role;
-            //             this.$pinia.state.value.user.valid  = true;
-            //             router.push('/dashboard');
-            //         } else {
-            //             this.alert_incorrect = true;
-            //         }
-            // },
-            isRememberMe() {
-                this.input.rememberMe === true;
-            },
-            moveToRegister() {
-                this.$router.push('/register');
-            },
+        moveToRegister() {
+            this.$router.push('/register');
         },
-        components: {
-            Header,
-        }
+    },
+    components: {
+        Header,
     }
+}
 </script>
 
 <script setup lang="ts">
-import { useDependencyStore } from "../stores/dependencies.js";
-import { useUserStore } from "../stores/user.js";
+// import { useDependencyStore } from "../stores/dependencies.js";
+// import { useUserStore } from "../stores/user.js";
 import axios from "axios";
 
-const storeDependencies = useDependencyStore();
-const storeUser = useUserStore();
-storeDependencies.loadDependencies();
+// const storeDependencies = useDependencyStore();
+// const storeUser = useUserStore();
+// storeDependencies.loadDependencies();
 
 </script>
 

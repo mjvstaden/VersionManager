@@ -11,6 +11,14 @@
                 <v-alert
                         icon="mdi-alert-circle"
                         type="warning"
+                        v-model="alert_error"
+                        title="Error"
+                        :text="error_msg"
+                        dismissible
+                ></v-alert>
+                <v-alert
+                        icon="mdi-alert-circle"
+                        type="warning"
                         v-model="alert_username"
                         title="Username"
                         text="Please enter a unique valid username (min. 2 characters)"
@@ -112,6 +120,7 @@
 import Header from "../components/Login_Header.vue";
 import AuthenticationService from "../services/AuthenticationService";
 
+
 const username: string = "";
     export default {
         name: "Register",
@@ -126,6 +135,10 @@ const username: string = "";
                 alert_success: false,
                 alert_email_exists: false,
                 alert_username_exists: false,
+                alert_error: false,
+
+                //Error
+                error_msg: "",
 
                 // User data 
                 username: "",
@@ -138,109 +151,81 @@ const username: string = "";
         methods: {
             validateInput() {
                 console.log("Validating user")
-                this.alert_success = false;
-                if (this.username === "" || this.username.length < 2) {
-                    this.alert_username = true;
-                    return;
-                } else 
-                    this.alert_username = false;
+                // this.alert_success = false;
+                // if (this.username === "" || this.username.length < 2) {
+                //     this.alert_username = true;
+                //     return;
+                // } else 
+                //     this.alert_username = false;
 
-                if (this.email === "") {
-                    this.alert_email = true;
-                    return;
-                } else 
-                    this.alert_email = false;
+                // if (this.email === "") {
+                //     this.alert_email = true;
+                //     return;
+                // } else 
+                //     this.alert_email = false;
 
-                if (this.email.length > 5) {
-                    var validRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
-                    if (!this.email.match(validRegex)) {
-                        this.alert_email = true;
-                        return;
-                    }
-                } else 
-                    this.alert_email = false;
+                // if (this.email.length > 5) {
+                //     var validRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
+                //     if (!this.email.match(validRegex)) {
+                //         this.alert_email = true;
+                //         return;
+                //     }
+                // } else 
+                //     this.alert_email = false;
 
-                if (this.role == "") {
-                    this.alert_role = true;
-                    return;
-                } else 
-                    this.alert_role = false;
+                // if (this.role == "") {
+                //     this.alert_role = true;
+                //     return;
+                // } else 
+                //     this.alert_role = false;
 
-                if (this.password === "") {
-                    this.alert_password = true;
-                    return;
-                }  else 
-                    this.alert_password = false;
+                // if (this.password === "") {
+                //     this.alert_password = true;
+                //     return;
+                // }  else 
+                //     this.alert_password = false;
 
-                if (this.confirmPassword === "") {
-                    this.alert_password = true;
-                    return;
-                } else 
-                    this.alert_password = false;
+                // if (this.confirmPassword === "") {
+                //     this.alert_password = true;
+                //     return;
+                // } else 
+                //     this.alert_password = false;
 
-                if (this.password !== this.confirmPassword) {
-                    this.alert_password_match = true;
-                    return;
-                } else 
-                    this.alert_password_match = false;
+                // if (this.password !== this.confirmPassword) {
+                //     this.alert_password_match = true;
+                //     return;
+                // } else 
+                //     this.alert_password_match = false;
 
-                if (this.password.length < 6) {
-                    this.alert_password = true;
-                    return;
-                } else 
-                    this.alert_password = false;
+                // if (this.password.length < 6) {
+                //     this.alert_password = true;
+                //     return;
+                // } else 
+                //     this.alert_password = false;
 
                 this.createUser();
             },
 
             async createUser() {
-                const response = await AuthenticationService.register({
-                    email: this.email,
-                    password: this.password,
-                });
-                console.log(response.data);
+                console.log("Creating user")
                 const data = {
                     "username": this.username,
                     "email": this.email,
                     "password": this.password,
                     "role": this.role
                 };
-                var usernameLookup = null;
                 console.log(data);
-                // try {
-                //     usernameLookup = await pocketbase.collection('users').getFirstListItem (
-                //     `username = "${this.username}"`,
-                //     );
-                // } catch (error) {
-                //     // console.log(error);
-                // }
-              
-                // if (usernameLookup != null) {
-                //     this.alert_username_exists = true;
-                //     return;
-                // } else 
-                //     this.alert_username_exists = false;
 
-                // var emailLookup = null;
-                // try {
-                //     emailLookup = await pocketbase.collection('users').getFirstListItem (
-                //     `email = "${this.email}"`,
-                //     );
-                // } catch (error) {
-                //     // console.log(error);
-                // }
-
-                // if (emailLookup != null) {
-                //     this.alert_email_exists = true;
-                //     return;
-                // } else 
-                //     this.alert_email_exists = false;
-
-                // try {
-                //     const record = await pocketbase.collection('users').create(data);
-                // } catch (error) {
-                //     // console.log(error);
-                // }
+                try {
+                   await AuthenticationService.register(data);
+                   this.alert_error = false;
+                   this.alert_success = true;
+                }
+                catch (error: any) {
+                    this.error_msg = error.response.data.error;
+                    this.alert_error = true;
+                }
+               
                 this.alert_email_exists = false;
                 this.alert_username_exists = false;
                 this.alert_username = false;
@@ -249,7 +234,7 @@ const username: string = "";
                 this.alert_password = false;
                 this.alert_password_match = false;
 
-                this.alert_success = true;
+                // this.alert_success = true;
 
                 // this.login();
                 
