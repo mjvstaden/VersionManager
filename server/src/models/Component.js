@@ -3,6 +3,7 @@ module.exports = (sequelize, DataTypes) => {
         name: DataTypes.STRING,
         version: DataTypes.STRING,
         history: DataTypes.BOOLEAN,
+        pervious_state: DataTypes.INTEGER,
     }, {
         hooks: {
         }
@@ -10,7 +11,8 @@ module.exports = (sequelize, DataTypes) => {
 
     Component.associate = function(models) {
         Component.belongsTo(models.Subsystem);
-        // Component.hasMany(models.Dependency);
+        Component.belongsTo(models.User);
+        
     }
     
     return Component;

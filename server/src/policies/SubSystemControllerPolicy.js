@@ -27,13 +27,13 @@ module.exports = {
       }
     }
   },
-  
+   
   async put(req, res, next) {
     const schema = Joi.object({
-      name: Joi.string().required(),
+      name: Joi.string().min(2).max(30),
       version: Joi.string(),
       history: Joi.number(),
-      SystemId: Joi.number().integer().min(1).required()
+      SystemId: Joi.number().integer().min(1)
     });
 
     try {

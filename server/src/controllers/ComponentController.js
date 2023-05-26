@@ -1,5 +1,37 @@
 const {Component} = require('../models')
 
+
+// Write a function that compares two components (an one and a update that needs to happen) and return a list of changes
+function getUpdatedComponent(component_old, component_new) {
+    const updated_component = {
+        name: "",
+        version: "",
+        history: false,
+        previous_state: component_old.id,
+        subsystemId: null,
+    }
+
+    if (component_new.name !== null) {
+        updated_component.name = component_new.name
+    } else {
+        updated_component.name = component_old.name
+    }
+   
+    if (component_new.version !== null) {
+        updated_component.version = component_new.version
+    } else {
+        updated_component.version = component_old.version
+    }
+
+    if (component_new.subsystemId !== null) {
+        updated_component.subsystemId = component_new.subsystemId
+    } else {
+        updated_component.subsystemId = component_old.subsystemId
+    }
+
+    return updated_component
+}
+
 module.exports = {
   async index (req, res) {
     try {
@@ -48,18 +80,27 @@ module.exports = {
       })
     }
   },
-  async put (req, res) {
-    try {
-      await Component.update(req.body, {
-        where: {
-          id: req.params.componentId
+    // Implement history functionality 
+    async put (req, res) {
+        try {
+            const component_old = await Component.findByPk(req.params.componentId)
+            const component_new = req.body
+            const updated_component = getUpdatedComponent(component_old, component_new)
+
+            //  Create new component with the updated values
+            const component = await Component.create(updated_component)
+
+            //  Update the old component to have history = true
+            await Component.update({history: true}, {
+                where: {
+                id: req.params.componentId
+                }
+            })
+            res.send(req.body)
+            } catch (err) {
+            res.status(500).send({
+                error: 'an error has occured trying to update the component'
+            })
         }
-      })
-      res.send(req.body)
-    } catch (err) {
-      res.status(500).send({
-        error: 'an error has occured trying to update the component'
-      })
     }
-  }
 }

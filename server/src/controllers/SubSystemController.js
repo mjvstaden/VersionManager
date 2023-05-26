@@ -51,8 +51,12 @@ module.exports = {
       })
     }
   },
+  // Implement history 
   async put (req, res) {
     try {
+      const subsystem_old = await Subsystem.findByPk(req.params.subsystemId)
+
+      // Set history to true if any of the fields have changed
       await Subsystem.update(req.body, {
         where: {
           id: req.params.subsystemId
