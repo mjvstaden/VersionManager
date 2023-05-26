@@ -3,6 +3,8 @@ import { Layouts, Nodes } from 'v-network-graph';
 import { reactive } from 'vue';
 import { pocketbase } from '../lib/pocketbase';
 import axios from 'axios';
+import AuthenticationService from '../services/AuthenticationService';
+import SystemsService from '../services/SystemsService';
 
 export const useSystemsStore = defineStore({
   id: 'systems',
@@ -47,16 +49,15 @@ export const useSystemsStore = defineStore({
       this.realtime();
       pocketbase.autoCancellation(false)
 
-      const path = 'http://127.0.0.1:5000/all_data'
+      let systemsFromDB = [] as any[];
 
-      // Get data from python server and store it in all_data
-      const all_data = axios.get(path).then((respone) =>
-      console.log(respone)
-      );
-
-      const systemsFromDB = await all_data
-
-      // const systemsFromDB = await pocketbase.collection('systems').getFullList();
+      try {
+        const res = await SystemsService.loadAll();
+        systemsFromDB = res.data;
+      } catch (error) {
+        console.log(error);
+      }
+        
       // this.subSystemsFromDB = await pocketbase.collection('sub_systems').getFullList();
       // this.componentsFromDB = await pocketbase.collection('components').getFullList();
 

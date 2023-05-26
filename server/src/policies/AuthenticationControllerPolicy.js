@@ -7,7 +7,7 @@ module.exports = {
       username: Joi.string(),
       role: Joi.string().valid('Developer', 'SIT', 'Support'),
       password: Joi.string().regex(
-        new RegExp('^[a-zA-Z0-9]{8,32}$')
+        new RegExp('^[a-zA-Z0-9!@#$&()\\-`.+,/\]{8,32}$')
       )
     });
 
@@ -40,10 +40,6 @@ module.exports = {
             res.status(400).send({
                 error: 'You must provide a valid role.'
             });
-        // default:
-        //   res.status(400).send({
-        //     error: 'Invalid registration information.'
-        //   });
       }
     }
   }

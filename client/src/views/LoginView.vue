@@ -21,10 +21,6 @@
                 <input type="email" id="email" name="email" v-model="input.email" placeholder="example@example.com">
                 <label for="password">Password:</label>
                 <input type="password" id="password" name="password" v-model="input.password" placeholder="Enter password">
-                <!-- <div class="rememberMe">
-                    <input type="checkbox" id="rememberMe" name="rememberMe" v-model="input.rememberMe">
-                    <label for="rememberMe">Remember me</label> 
-                </div> -->
                 <button class="login-button" @click="login()">Login</button>
             </div>
             <a @click="moveToRegister()">Need an account?</a>
@@ -37,6 +33,8 @@
 import Header from "../components/Login_Header.vue";
 import router from "../router";
 import AuthenticationService from "../services/AuthenticationService";
+import { mapActions } from 'pinia';
+import {useUserStore} from "../stores/user";
 
 export default {
     name: "Login",
@@ -54,13 +52,21 @@ export default {
         }
     },
     methods: {
+        ...mapActions(useUserStore, ['setToken', 'setUser']),
+
         async login() {
             try {
-                await AuthenticationService.login({
+                const res = await AuthenticationService.login({
                     email: this.input.email,
                     password: this.input.password,
                 });
                 this.alert_incorrect = false;
+
+                // Update userStore
+                const userStore = useUserStore();
+                userStore.setToken(res.data.token);
+                userStore.setUser(res.data.user);
+
                 router.push('/dashboard');
 
             } catch (error: any) {
@@ -79,16 +85,10 @@ export default {
 </script>
 
 <script setup lang="ts">
-// import { useDependencyStore } from "../stores/dependencies.js";
-// import { useUserStore } from "../stores/user.js";
-import axios from "axios";
 
-// const storeDependencies = useDependencyStore();
-// const storeUser = useUserStore();
-// storeDependencies.loadDependencies();
+// const userStore = useUserStore();
 
 </script>
-
 
 <style>
 @import url('https://fonts.googleapis.com/css2?family=M+PLUS+1p&display=swap');

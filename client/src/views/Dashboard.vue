@@ -23,6 +23,8 @@
 import Header from "../components/Home_Header.vue";
 import SideMenu from "../components/SideMenu.vue";
 import DashboardCard from "../components/DashboardCard.vue";
+import { mapActions } from 'pinia';
+import {useSystemsStore} from "../stores/systems";
 import router from "../router";
 
     export default {
@@ -33,6 +35,7 @@ import router from "../router";
             }
         },   
         methods: {
+        ...mapActions(useSystemsStore, ["loadSystems"]),
         },
         components: {
             Header,
@@ -44,10 +47,6 @@ import router from "../router";
 </script>
 
 <script setup lang="ts">
-import { useSystemsStore } from "../stores/systems";
-
- const path = 'http://127.0.0.1:5000/dashboard';
-
 
 // import { pocketbase } from "../lib/pocketbase";
 // import { useComponentStore } from "../stores/components.js";
@@ -62,7 +61,7 @@ import { useSystemsStore } from "../stores/systems";
 // const storeComponents = useComponentStore();
 // const storeSubSystems = useSubSystemsStore();
 // const storeDependencies = useDependencyStore();
-const storeSystems = useSystemsStore();
+// const storeSystems = useSystemsStore();
 // const storeUser = useUserStore();
 
 // if (storeComponents.refresh && storeComponents.lock == false) {
@@ -71,9 +70,9 @@ const storeSystems = useSystemsStore();
 // if (storeSubSystems.refresh && storeSubSystems.lock == false) {
 //     storeSubSystems.loadSystems();
 // }
-if (storeSystems.refresh && storeSystems.lock == false) {
-    storeSystems.loadSystems();
-}
+// if (storeSystems.refresh && storeSystems.lock == false) {
+//     storeSystems.loadSystems();
+// }
 // if (storeDependencies.refresh && storeDependencies.lock == false) {
 //     storeDependencies.loadDependencies();
 // }

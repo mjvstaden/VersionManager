@@ -8,60 +8,12 @@
         <div class="login-container"> 
             <div class="form">
                 <div class="alerts">
-                <v-alert
+                    <v-alert
                         icon="mdi-alert-circle"
                         type="warning"
                         v-model="alert_error"
                         title="Error"
                         :text="error_msg"
-                        dismissible
-                ></v-alert>
-                <v-alert
-                        icon="mdi-alert-circle"
-                        type="warning"
-                        v-model="alert_username"
-                        title="Username"
-                        text="Please enter a unique valid username (min. 2 characters)"
-                        dismissible
-                ></v-alert>
-                <v-alert
-                        icon="mdi-alert-circle"
-                        type="warning"
-                        v-model="alert_email"
-                        title="Email"
-                        text="Please enter a valid email address."
-                        dismissible
-                ></v-alert>
-                <v-alert
-                        icon="mdi-alert-circle"
-                        type="warning"
-                        v-model="alert_username_exists"
-                        title="Username"
-                        text="This username is already taken."
-                        dismissible
-                ></v-alert>
-                <v-alert
-                        icon="mdi-alert-circle"
-                        type="warning"
-                        v-model="alert_email_exists"
-                        title="Email"
-                        text="This email address is already associated with an account."
-                        dismissible
-                ></v-alert>
-                <v-alert
-                        icon="mdi-alert-circle"
-                        type="warning"
-                        v-model="alert_role"
-                        title="Role"
-                        text="Please select a role"
-                        dismissible
-                ></v-alert>
-                <v-alert
-                        icon="mdi-alert-circle"
-                        type="warning"
-                        v-model="alert_password"
-                        title="Password"
-                        text="Please enter a valid password (min. 6 characters and matching)"
                         dismissible
                 ></v-alert>
                 <v-alert
@@ -95,11 +47,6 @@
                     required
                 ></v-select>
                 </div>
-                <!-- <select name="role" id="role" v-model="role" required>
-                    <option value="Developer">Developer</option>
-                    <option value="SIT">SIT</option>
-                    <option value="Support">Support</option>
-                </select> -->
                 <label for="password">Password:</label>
                 <input  class="input" type="password" id="password" name="password"  v-model="password" required>
                 <label for="confirm-password">Confirm Password:</label>
@@ -127,10 +74,6 @@ const username: string = "";
         data() {
             return {
                 //Alerts
-                alert_username: false,
-                alert_email: false,
-                alert_role: false,
-                alert_password: false,
                 alert_password_match: false,
                 alert_success: false,
                 alert_email_exists: false,
@@ -150,58 +93,12 @@ const username: string = "";
         },
         methods: {
             validateInput() {
-                console.log("Validating user")
-                // this.alert_success = false;
-                // if (this.username === "" || this.username.length < 2) {
-                //     this.alert_username = true;
-                //     return;
-                // } else 
-                //     this.alert_username = false;
 
-                // if (this.email === "") {
-                //     this.alert_email = true;
-                //     return;
-                // } else 
-                //     this.alert_email = false;
-
-                // if (this.email.length > 5) {
-                //     var validRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
-                //     if (!this.email.match(validRegex)) {
-                //         this.alert_email = true;
-                //         return;
-                //     }
-                // } else 
-                //     this.alert_email = false;
-
-                // if (this.role == "") {
-                //     this.alert_role = true;
-                //     return;
-                // } else 
-                //     this.alert_role = false;
-
-                // if (this.password === "") {
-                //     this.alert_password = true;
-                //     return;
-                // }  else 
-                //     this.alert_password = false;
-
-                // if (this.confirmPassword === "") {
-                //     this.alert_password = true;
-                //     return;
-                // } else 
-                //     this.alert_password = false;
-
-                // if (this.password !== this.confirmPassword) {
-                //     this.alert_password_match = true;
-                //     return;
-                // } else 
-                //     this.alert_password_match = false;
-
-                // if (this.password.length < 6) {
-                //     this.alert_password = true;
-                //     return;
-                // } else 
-                //     this.alert_password = false;
+                if (this.password !== this.confirmPassword) {
+                    this.alert_password_match = true;
+                    return;
+                } else 
+                    this.alert_password_match = false;
 
                 this.createUser();
             },
@@ -214,12 +111,12 @@ const username: string = "";
                     "password": this.password,
                     "role": this.role
                 };
-                console.log(data);
 
                 try {
                    await AuthenticationService.register(data);
                    this.alert_error = false;
                    this.alert_success = true;
+                   this.$router.push({ path: "/dashboard"});
                 }
                 catch (error: any) {
                     this.error_msg = error.response.data.error;
@@ -228,35 +125,14 @@ const username: string = "";
                
                 this.alert_email_exists = false;
                 this.alert_username_exists = false;
-                this.alert_username = false;
-                this.alert_email = false;
-                this.alert_role = false;
-                this.alert_password = false;
                 this.alert_password_match = false;
 
-                // this.alert_success = true;
-
                 // this.login();
-                
-            },
-            async login() {
-                try {
-
-                    await pocketbase.collection('users').authWithPassword(this.email, this.password);
-                    const res = await pocketbase.collection('users').requestVerification(this.email);
-
-                    if (res) alert('Verification email sent! Please check your email and verify your account.');
-                    
-                    if (pocketbase.authStore.isValid) {
-                        this.$router.push('/dashboard');
-                    }
-                } catch (error) {
-                    // console.log(error);
-                }
-                pocketbase.authStore.clear();
+           
             },
             goToLogin() {
                 this.$router.push({ path: "/login"});
+
                 this.alert_success = false;
             }
         },
