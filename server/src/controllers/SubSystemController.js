@@ -9,10 +9,12 @@ module.exports = {
         subsystems = await Subsystem.findAll({
           where: {
             $or: [
-              'name', 'version', 'history', 
+              sequelize.literal('lower(name)'), 
+              sequelize.literal('lower(version)'), 
+              sequelize.literal('lower(history)') 
             ].map(key => ({
               [key]: {
-                $like: `%${search}%`
+                $like: `%${search.toLowerCase()}%` 
               }
             }))
           }
@@ -32,6 +34,7 @@ module.exports = {
       const subsystem = await Subsystem.findByPk(req.params.subsystemId)
       res.send(subsystem)
     } catch (err) {
+      // console.log(err)
       res.status(500).send({
         error: 'an error has occured trying to show the sub-systems'
       })
@@ -42,6 +45,7 @@ module.exports = {
       const subsystem = await Subsystem.create(req.body)
       res.send(subsystem)
     } catch (err) {
+      // console.log(err)
       res.status(500).send({
         error: 'an error has occured trying to create the sub-system'
       })

@@ -4,14 +4,12 @@ module.exports = (sequelize, DataTypes) => {
         version: DataTypes.STRING,
         history: DataTypes.BOOLEAN,
     }, {
-        hooks: {
-        }
+        timestamps: true, 
     });
 
     Subsystem.associate = function(models) {
         Subsystem.hasMany(models.Component)
         Subsystem.belongsTo(models.System);
-        Subsystem.hasMany(models.Component);
     }
     
     return Subsystem;

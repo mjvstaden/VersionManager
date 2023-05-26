@@ -1,0 +1,20 @@
+[
+    {
+    "email": "mj.vanstaden@vastech.co.za",
+    "username": "mjvs",
+    "role": "Developer",
+    "password": "12345678"
+    },
+    {
+        "email": "support@gmail.com",
+        "username": "support_user",
+        "role": "Support",
+        "password": "12345678"
+    },
+    {
+        "email": "sit@gmail.com",
+        "username": "sit_user",
+        "role": "SIT",
+        "password": "12345678"
+    }
+]
