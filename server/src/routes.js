@@ -5,6 +5,7 @@ const ComponentController = require("./controllers/ComponentController")
 const AuthenticationControllerPolicy = require("./policies/AuthenticationControllerPolicy")
 const ComponentControllerPolicy = require("./policies/ComponentControllerPolicy")
 const SubSystemControllerPolicy = require("./policies/SubSystemControllerPolicy")
+const SystemControllerPolicy = require("./policies/SystemControllerPolicy")
 
 module.exports = function(app) {
     app.post('/register', 
@@ -18,8 +19,10 @@ module.exports = function(app) {
     app.get('/systems/:systemId',
         SystemController.show)
     app.put('/systems/:systemId',
+        SystemControllerPolicy.put,
         SystemController.put)
     app.post('/systems',
+        SystemControllerPolicy.post,
         SystemController.post)
 
     app.get('/subsystems',
@@ -27,6 +30,7 @@ module.exports = function(app) {
     app.get('/subsystems/:subsystemId',
         SubSystemController.show)
     app.put('/subsystems/:subsystemId',
+        SubSystemControllerPolicy.put,
         SubSystemController.put)
     app.post('/subsystems',
         SubSystemControllerPolicy.post,
@@ -37,6 +41,7 @@ module.exports = function(app) {
     app.get('/components/:componentId',
         ComponentController.show)
     app.put('/components/:componentId',
+        ComponentControllerPolicy.put,
         ComponentController.put)
     app.post('/components',
         ComponentControllerPolicy.post,

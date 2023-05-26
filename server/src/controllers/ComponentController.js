@@ -29,7 +29,8 @@ module.exports = {
   },
   async show (req, res) {
     try {
-      const component = await Component.findById(req.params.componentId)
+      console.log('req.params.componentId', req.params.componentId)
+      const component = await Component.findByPk(req.params.componentId)
       res.send(component)
     } catch (err) {
       res.status(500).send({

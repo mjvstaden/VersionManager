@@ -29,7 +29,7 @@ module.exports = {
   },
   async show (req, res) {
     try {
-      const subsystem = await Subsystem.findById(req.params.subsystemId)
+      const subsystem = await Subsystem.findByPk(req.params.subsystemId)
       res.send(subsystem)
     } catch (err) {
       res.status(500).send({
