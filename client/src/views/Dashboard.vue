@@ -24,7 +24,7 @@ import Header from "../components/Home_Header.vue";
 import SideMenu from "../components/SideMenu.vue";
 import DashboardCard from "../components/DashboardCard.vue";
 import { mapActions } from 'pinia';
-import {useSystemsStore} from "../stores/systems";
+// import {useSystemsStore} from "../stores/systems";
 import router from "../router";
 
     export default {
@@ -47,16 +47,11 @@ import router from "../router";
 </script>
 
 <script setup lang="ts">
+import { useSystemsStore } from "../stores/systems";
 
-// import { pocketbase } from "../lib/pocketbase";
-// import { useComponentStore } from "../stores/components.js";
-// import { useSubSystemsStore } from "../stores/subSystems.js";
-// import { useDependencyStore } from "../stores/dependencies.js";
-// import { useUserStore } from "../stores/user.js";
+const systemStore = useSystemsStore();
 
-// if (pocketbase.authStore.isValid == false) {
-//     router.push("/login");
-// }
+systemStore.loadSystems();
 
 // const storeComponents = useComponentStore();
 // const storeSubSystems = useSubSystemsStore();

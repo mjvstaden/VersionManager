@@ -24,10 +24,10 @@ export default {
     put (component: any) {
         return Api().put(`components/${component.id}`, component)
     },
-    delete (component_id: number) {
+    delete (component_id: string) {
         return Api().put(`components/delete/${component_id}`)
     },
-    getHistory (component_id: number) {
+    getHistory (component_id: string) {
         return Api().get(`components/history/${component_id}`)
     }
 }

@@ -1,23 +1,21 @@
 import { defineStore } from 'pinia';
 import { Layouts, Nodes } from 'v-network-graph';
 import { reactive } from 'vue';
-import { pocketbase } from '../lib/pocketbase';
 import axios from 'axios';
 import AuthenticationService from '../services/AuthenticationService';
 import SystemsService from '../services/SystemsService';
+import SubSystemService from '../services/SubSystemService';
+import ComponentService from '../services/ComponentService';
 
 export const useSystemsStore = defineStore({
   id: 'systems',
   state: () => ({
-    systems: [] as {id: string, name: string, children: {id: string, name: string, color: string, children: {id: string, name: string}[]}[]}[],
+    systems: [] as any[],
     subsystems: [] as string[],
     selected: "" as string,
     layouts: reactive({}) as Layouts,
     nodes: reactive({}) as Nodes,
     componentsFromDB: [] as any[],
-    realTimeComponents: [] as any[],
-    realTimeSubSystems: [] as any[],
-    realTimeSystems: [] as any[],
     subSystemsFromDB: [] as any[],
     names: reactive([]) as string[],
     ids: reactive([]) as string[],
@@ -25,41 +23,9 @@ export const useSystemsStore = defineStore({
     lock: false as boolean,
   }),
   actions: {
-    
-    async realtime() {
-      
-      // pocketbase.collection('systems').subscribe('*',  (data: any) => {
-      //   // console.log("Subscribe System Data", data);
-      //   this.realTimeSystems.push(data);
-      // });
-      // pocketbase.collection('sub_systems').subscribe('*',  (data: any) => {
-      //   // console.log("Subscribe Sub-System Data", data);
-      //   this.realTimeSubSystems.push(data);
-      // });
-      // pocketbase.collection('components').subscribe('*',  (data: any) => {
-      //   // console.log("Subscribe Component Data", data);
-      //   this.realTimeComponents.push(data);
-      // });
-    },
-    async loadUpdatestoSystem() {
 
-    },
     async loadSystems() {
       this.lock = true;
-      this.realtime();
-      pocketbase.autoCancellation(false)
-
-      let systemsFromDB = [] as any[];
-
-      try {
-        const res = await SystemsService.loadAll();
-        systemsFromDB = res.data;
-      } catch (error) {
-        console.log(error);
-      }
-        
-      // this.subSystemsFromDB = await pocketbase.collection('sub_systems').getFullList();
-      // this.componentsFromDB = await pocketbase.collection('components').getFullList();
 
       this.systems.length = 0;
       this.systems = [];
@@ -67,89 +33,64 @@ export const useSystemsStore = defineStore({
       this.names.length = 0;
       this.ids.length = 0;
 
-      // Get names of all the children of the systems so that we can display them in the UI
-      for (let i = 0; i < systemsFromDB.length; i++) {
-        let subsystems: {id: string, name: string, color: string, children: {id: string, name: string}[]}[] = [];
-        let arrIndex = 0;
-        for (let j = 0; j < systemsFromDB[i].children.length; j++) {
-          try {
-            // const record = await pocketbase.collection('sub_systems').getOne(systemsFromDB[i].children[j]);
-            const sub_system = this.subSystemsFromDB.find((sub_system) => sub_system.id === systemsFromDB[i].children[j]);
-
-            if (sub_system?.history === false) {
-                let components: {id: string, name: string}[] = [];
-                let index = 0;
-                for (let k = 0; k < sub_system?.children.length; k++) {
-                    try {
-                        const component = this.componentsFromDB.find((component) => component.id === sub_system?.children[k]);
-                        if (component?.history === false && component !== undefined) {
-                            components[index] = {id: String(component.id), name: String(component.component_name)}
-                            index++;
-                        }
-                    } catch (error) {
-                        console.log(error);
-                    }
-                }
-                subsystems[arrIndex] = {id: String(systemsFromDB[i].children[j]), name: sub_system.name, color: sub_system.color , children: components}
-                arrIndex++;
-            }
-          } catch (error) {
-            console.log(error);
+      try {
+        const res = await SystemsService.index("");
+        this.systems = res.data;
+        for (let i = 0; i < this.systems.length; i++) {
+          this.systems[i].subsystems = (await SystemsService.getChildren(this.systems[i].id)).data;
+          for (let j = 0; j < this.systems[i].subsystems.length; j++) {
+            this.systems[i].subsystems[j].components = (await SubSystemService.getChildren(this.systems[i].subsystems[j].id)).data;
           }
-        } 
-
-        this.addSubSystem({id: systemsFromDB[i].id, name: systemsFromDB[i].name, children: subsystems});
-        this.addSystem(systemsFromDB[i].name, systemsFromDB[i].id);
+        }
+        console.log("Systems", this.systems);
+      } catch (error) {
+        console.log(error);
       }
-      this.getLayouts(this.systems[0].name);
+        
+      this.subSystemsFromDB = (await SubSystemService.index("")).data;
+      this.componentsFromDB = (await SubSystemService.index("")).data;
+
+      this.getLayouts(this.systems[0].id);
+
       this.refresh = false;
       this.lock = false;
     },
-    getSubSystems(system_name: string) {
-      let index = this.systems.findIndex((element) => element.name === system_name);
+    async getSubSystems(system_id: string) {
       this.subsystems.length = 0;
-      if (this.systems[index] !== undefined) {
-        for (let i = 0; i < this.systems[index].children.length; i++) {
-          this.subsystems.push(this.systems[index].children[i].name);
-        }
-      }
+      this.subsystems = (await SystemsService.getChildren(system_id)).data;
     },
-    addSubSystem(system: {id: string, name: string, children: {id: string, name: string, color: string, children: {id: string, name: string}[]}[]}) {
-      this.systems.push(system);
-    },
-    addSystem(name: string, id: string) {
-      this.names.push(name);
-      this.ids.push(id);
-    },
-    async getLayouts(name: string) {
+    async getLayouts(system_id: string) {
       const system_in_row = 7;
       let max_y = 0;
-      this.getSubSystems(name);
+      let ssystem_row = 0;
+      let ssystem_col = 0;
+      let row_start = 0;
+
       const layouts: Layouts = {
         nodes: {},
       };
       layouts.nodes = {};
       const nodes: Nodes = {};
 
-      let index = this.systems.findIndex((element) => element.name === name);
-      let ssystem_row = 0;
-      let ssystem_col = 0;
-      let row_start = 0;
-      
-      for (let i = 0; i < this.systems[index].children.length; i++) {
+      this.getSubSystems(system_id);
 
+      const subsystems = (await SystemsService.getChildren(system_id)).data;
+     
+      console.log("Subsystems", subsystems);
+
+      for (let i = 0; i < subsystems.length; i++) {
+        
         if (ssystem_col == system_in_row) {
           ssystem_col = 0;
           ssystem_row++;
           row_start = max_y;
         }
-        
-        const sub_system = this.subSystemsFromDB.find((sub_system) => sub_system.id === this.systems[index].children[i].id);
-
+  
         let nrow = 0;
         let ncol = 0;
 
-        for (let j = 0; j < sub_system.children.length; j++) {
+        const components = (await SubSystemService.getChildren(subsystems[i].id)).data;
+        for (let j = 0; j < components.length; j++) {
           if (ncol == 3) {
             ncol = 0; 
             nrow++
@@ -157,10 +98,10 @@ export const useSystemsStore = defineStore({
           if (nrow*100 > max_y) {
             max_y = nrow*100;
           }
-          const component = this.componentsFromDB.find((component) => component.id === sub_system.children[j]);
-          component.component_name = this.makeMultiLine(component.component_name);
-          layouts.nodes[component.id] = {x: 350*ssystem_col + 80*(ncol), y: 100*nrow + (row_start) + 300*ssystem_row}; 
-          nodes[component.id] = {name: component.component_name, color: sub_system.color};
+          
+          components[j].name = this.makeMultiLine(components[j].name);
+          layouts.nodes[components[j].id] = {x: 350*ssystem_col + 80*(ncol), y: 100*nrow + (row_start) + 300*ssystem_row}; 
+          nodes[components[j].id] = {name: components[j].name, color: subsystems[i].color};
           ncol++;
         }
         ssystem_col++;
