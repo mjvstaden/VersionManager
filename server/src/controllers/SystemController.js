@@ -1,5 +1,6 @@
 const {System} = require('../models')
 const {Subsystem} = require('../models')
+const {Component} = require('../models')
 
 module.exports = {
   async index (req, res) {
@@ -77,5 +78,6 @@ module.exports = {
         error: 'an error has occured trying to update the system'
       })
     }
-  }
+  },
+
 }

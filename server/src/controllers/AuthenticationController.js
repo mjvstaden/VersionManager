@@ -54,5 +54,9 @@ module.exports = {
                 error: "An error has occured trying to log in.",
             })
         }
-    }
+    },
+    async index(req, res) {
+        const users = await User.findAll()
+        res.send(users)
+    },
 }

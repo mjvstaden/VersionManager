@@ -17,6 +17,8 @@ module.exports = function(app) {
         AuthenticationController.register)
     app.post('/login', 
         AuthenticationController.login)
+    app.get('/users/all',
+        AuthenticationController.index)
 
     app.get('/systems',
         SystemController.index)
