@@ -17,6 +17,9 @@ export default {
     put (system: any) {
         return Api().put(`systems/${system.id}`, system)
     },
+    getChildren (system_id: number) {
+        return Api().get(`systems/children/${system_id}`)
+    },
     delete (system_id: string) {
         return Api().delete(`systems/${system_id}`)
     },

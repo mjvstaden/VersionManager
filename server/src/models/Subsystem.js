@@ -3,6 +3,7 @@ module.exports = (sequelize, DataTypes) => {
         name: DataTypes.STRING,
         version: DataTypes.STRING,
         history: DataTypes.BOOLEAN,
+        previous_state: DataTypes.INTEGER,
     }, {
         timestamps: true, 
     });

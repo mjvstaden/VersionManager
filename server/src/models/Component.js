@@ -3,16 +3,12 @@ module.exports = (sequelize, DataTypes) => {
         name: DataTypes.STRING,
         version: DataTypes.STRING,
         history: DataTypes.BOOLEAN,
-        pervious_state: DataTypes.INTEGER,
-    }, {
-        hooks: {
-        }
+        previous_state: DataTypes.INTEGER,
     });
 
     Component.associate = function(models) {
         Component.belongsTo(models.Subsystem);
         Component.belongsTo(models.User);
-        
     }
     
     return Component;

@@ -1,4 +1,5 @@
 const {System} = require('../models')
+const {Subsystem} = require('../models')
 
 module.exports = {
   async index (req, res) {
@@ -34,6 +35,22 @@ module.exports = {
     } catch (err) {
       res.status(500).send({
         error: 'an error has occured trying to show the systems'
+      })
+    }
+  },
+  async getChildren (req, res) {
+    try {
+      const children = await Subsystem.findAll({
+        where: {
+          SystemId: req.params.systemId,
+          history: false
+        }
+      })
+      res.send(children)
+    }
+    catch (err) {
+      res.status(500).send({
+        error: 'an error has occured trying to fetch the sub-system children'
       })
     }
   },
