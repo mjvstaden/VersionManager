@@ -229,7 +229,7 @@
                                         ref="parent_select"
                                         class="parent_select"
                                         v-model="edit_parent"
-                                        :items="storeSystems.subsystems"
+                                        :items="storeSystems.subSystemNames"
                                     ></v-select>
                                 </v-row>
                                 <v-row>
@@ -1479,7 +1479,7 @@ const nodeMenu = ref<HTMLDivElement>()
 
 function showNodeContextMenu(params: vNG.NodeEvent<MouseEvent>) {
     storeGraph.showInfoDialog = true;
-    const record = storeComponents?.components.filter((item: any) => item.id == params.node);
+    const record = storeSystems?.componentsFromDB.filter((item: any) => item.id == params.node);
     selectedNodes.value.length = 0;
     selectedNodes.value[0] = params.node;
     edit_id = record[0]?.id;
