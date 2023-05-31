@@ -103,6 +103,7 @@ module.exports = {
     }
   },
   async post (req, res) {
+    console.log(req.body)
     try {
       const component = await Component.create(req.body)
       res.send(component)

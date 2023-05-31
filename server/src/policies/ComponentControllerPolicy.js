@@ -8,11 +8,11 @@ module.exports = {
       history: Joi.number(),
       SubsystemId: Joi.number().integer().min(1).required()
     });
-
     try {
       const value = await schema.validateAsync(req.body);
       next();
     } catch (error) {
+      console.log(error);
       switch (error.details[0].context.key) {
         case 'name':
           res.status(400).send({

@@ -6,7 +6,8 @@ module.exports = {
       name: Joi.string().required(),
       version: Joi.string(),
       history: Joi.number(),
-      SystemId: Joi.number().integer().min(1).required()
+      SystemId: Joi.number().integer().min(1).required(),
+      color: Joi.string().regex(/^#[0-9A-F]{6}$/i)
     });
 
     try {
