@@ -1,4 +1,5 @@
 const Promise = require('bluebird');
+const UserSystems = require('./UserSystems');
 const bcrypt = Promise.promisifyAll(require('bcrypt-nodejs'));
 
 function hashPassword(user, options) {
@@ -34,7 +35,7 @@ module.exports = (sequelize, DataTypes) => {
         }
     });
     User.associate = function(models) {
-        User.belongsToMany(models.System, {through: 'SystemsUsers'})
+        // User.belongsToMany(models.System, {through: UserSystems, foreignKey: 'UserId'})
     },
     User.prototype.comparePassword = async function (password) {
         await bcrypt.compare(password, this.password).then(function (result) {

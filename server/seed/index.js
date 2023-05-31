@@ -5,6 +5,7 @@ const {
     Component,
     Dependency,
     User,
+    UserSystems
   } = require('../src/models')
   
   const Promise = require('bluebird')
@@ -12,6 +13,7 @@ const {
   const subsystems = require('./subsystems.json')
   const components = require('./components.json')
   const dependencies = require('./dependencies.json')
+  const usersystems = require('./usersystems.json')
   const users = require('./users.json')
   
   sequelize.sync({force: true})
@@ -45,5 +47,11 @@ const {
         users.map(user => {
           User.create(user)
         })
+      )
+
+      await Promise.all(
+        usersystems.map(usersystem => {
+          UserSystems.create(usersystem)
+        })  
       )
     })

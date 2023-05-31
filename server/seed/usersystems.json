@@ -1,0 +1,30 @@
+[
+    {
+        "UserId": "1",
+        "SystemId": "1"
+    },
+    {
+        "UserId": "1",
+        "SystemId": "2"
+    },
+    {
+        "UserId": "1",
+        "SystemId": "3"
+    },
+    {
+        "UserId": "2",
+        "SystemId": "1"
+    },
+    {
+        "UserId": "2",
+        "SystemId": "2"
+    },
+    {
+        "UserId": "3",
+        "SystemId": "2"
+    },
+    {
+        "UserId": "3",
+        "SystemId": "1"
+    }
+]

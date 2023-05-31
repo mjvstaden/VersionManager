@@ -3,54 +3,63 @@
         "name": "test sub 1",
         "version": "20.2.1",
         "SystemId": 1,
-        "history": 0
+        "history": 0,
+        "color": "#57AC8F"
     },
     {
         "name": "test sub 2",
         "version": "20.2.1",
         "SystemId": 1,
-        "history": 0
+        "history": 0,
+        "color": "#5774AC"
     },
     {
         "name": "test sub 3",
         "version": "20.2.1",
         "SystemId": 1,
-        "history": 0
+        "history": 0,
+        "color": "#C96363"
     },
     {
         "name": "test sub 1",
         "version": "20.2.1",
         "SystemId": 2,
-        "history": 0
+        "history": 0,
+        "color": "#57AC8F"
     },
     {
         "name": "test sub 2",
         "version": "20.2.1",
         "SystemId": 2,
-        "history": 0
+        "history": 0,
+        "color": "#5774AC"
     },
     {
         "name": "test sub 3",
         "version": "20.2.1",
         "SystemId": 2,
-        "history": 0
+        "history": 0,
+        "color": "#C96363"
     },
     {
         "name": "test sub 1",
         "version": "20.2.1",
         "SystemId": 3,
-        "history": 0
+        "history": 0,
+        "color": "#57AC8F"
     },
     {
         "name": "test sub 2",
         "version": "20.2.1",
         "SystemId": 3,
-        "history": 0
+        "history": 0,
+        "color": "#5774AC"
     },
     {
         "name": "test sub 3",
         "version": "20.2.1",
         "SystemId": 3,
-        "history": 0
+        "history": 0,
+        "color": "#C96363"
     }
 ]
