@@ -18,12 +18,12 @@ export const useSystemsStore = defineStore({
     componentsFromDB: [] as any[],
     subSystemsFromDB: [] as any[],
     subSystemNames: [] as string[],
+    systemNames: [] as string[],
     ids: reactive([]) as string[],
     refresh: true as boolean,
     lock: false as boolean,
   }),
   actions: {
-
     async loadSystems() {
       this.lock = true;
 
@@ -53,8 +53,20 @@ export const useSystemsStore = defineStore({
       this.getLayouts(this.systems[0].id);
 
       this.getSubSystemNames(this.systems[0].id);
+      this.getSystemNames();
+
       this.refresh = false;
       this.lock = false;
+    },
+    async refreshSubSystems() {
+      this.subsystems.length = 0;
+      this.subSystemNames.length = 0;
+
+      for (let i = 0; i < this.systems.length; i++) {
+        this.systems[i].subsystems = (await SystemsService.getChildren(this.systems[i].id)).data;
+      }
+      this.subSystemsFromDB = (await SubSystemService.index("")).data;
+      this.getSubSystemNames(this.systems[0].id);
     },
     async getSubSystems(system_id: string) {
       this.subsystems.length = 0;
@@ -64,6 +76,10 @@ export const useSystemsStore = defineStore({
       this.subSystemNames.length = 0;
       let children = (await SystemsService.getChildren(system_id)).data;
       this.subSystemNames = children.map((child: any) => child.name);
+    },
+    async getSystemNames() {
+      this.systemNames.length = 0;
+      this.systemNames = this.systems.map((system: any) => system.name);
     },
     async getLayouts(system_id: string) {
       const system_in_row = 7;
@@ -82,8 +98,6 @@ export const useSystemsStore = defineStore({
 
       const subsystems = (await SystemsService.getChildren(system_id)).data;
      
-      console.log("Subsystems", subsystems);
-
       for (let i = 0; i < subsystems.length; i++) {
         
         if (ssystem_col == system_in_row) {

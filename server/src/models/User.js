@@ -33,7 +33,9 @@ module.exports = (sequelize, DataTypes) => {
         //   beforeSave: hashPassword
         }
     });
-
+    User.associate = function(models) {
+        User.belongsToMany(models.System, {through: 'SystemsUsers'})
+    },
     User.prototype.comparePassword = async function (password) {
         await bcrypt.compare(password, this.password).then(function (result) {
             console.log("\n\n Result: " + result + "\n\n")

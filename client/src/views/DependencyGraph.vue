@@ -223,7 +223,7 @@
                                 </div>
                             
                                 </v-row>
-                                <v-row>
+                                <!-- <v-row>
                                     <v-label class="edit_label">Parent system</v-label>
                                     <v-select
                                         ref="parent_select"
@@ -231,7 +231,7 @@
                                         v-model="edit_parent"
                                         :items="storeSystems.subsystems"
                                     ></v-select>
-                                </v-row>
+                                </v-row> -->
                                 <v-row>
                                     <div class="edit_input">
                                         <v-label class="edit_label">Component Version</v-label>
@@ -763,15 +763,15 @@
                                 </div>
                             
                                 </v-row>
-                                <v-row>
+                                <!-- <v-row>
                                     <v-label class="edit_label">Parent System</v-label>
                                     <v-select
                                         ref="parent_select"
                                         class="parent_select"
                                         v-model="new_subsystem_parent"
-                                        :items="assigned_system_names"
+                                        :items="storeSystems.systemNames"
                                         ></v-select>
-                                </v-row>
+                                </v-row> -->
                                 <v-row>
                                 <div class="edit_input">
                                     <v-label class="edit_label">Sub-System Version</v-label>
@@ -1319,6 +1319,7 @@ const storeSubSystems = useSubSystemsStore();
 const storeDependencies = useDependencyStore();
 const storeGraph = useGraphStore();
 const storeSystems = useSystemsStore();
+const storeUser = useUserStore();
 
 if (storeComponents.refresh && storeComponents.lock == false) {
     storeComponents.loadComponents();
@@ -1448,9 +1449,6 @@ let dialogDeleteNodes = ref(false);
 
 // SubSystem with same name dialog
 let subSystemWithSameNameDialog = ref(false);
-
-
-
 
 function showContextMenu(element: HTMLElement, event: MouseEvent) {
   element.style.left = event.x + "px"
@@ -1758,53 +1756,15 @@ async function checkSubSystemName() {
 
 async function newSubSystem() {
 
-    // if (new_subsystem_name.value.trim().length < 2) {
-    //         alert_subsystem_name.value = true;
-    //         return;
-    //     } else 
-    //         alert_subsystem_name.value = false;
-
-    //     // Create new subsystem in pocketbase
-    //     let parent = storeSystems.systems.find((system: any) => system.name == new_subsystem_parent.value);
-    //     let parent_id: string = parent?.id ?? "";
-    //     let parent_name = parent?.name;
-
-    //     const data = {
-    //         "name": new_subsystem_name.value,
-    //         "children": [],            
-    //         "color": new_subsystem_color.value,
-    //         "parent": [parent_id],
-    //         "history": false,
-    //         "action": "created",
-    //     };
-
-    //     const new_subSystem = await pocketbase.collection('sub_systems').create(data);
-
-    //     // Update system children in pocketbase
-    //     let children = parent?.children.map((child: any) => child.id);
-    //     children?.push(new_subSystem.id);
-
-    //     const new_data = {
-    //         "children": children
-    //     }
-
-    //     await pocketbase.collection('systems').update(parent_id, new_data);
-
-    //     storeSystems.subSystemsFromDB.push(new_subSystem);
-    //     storeSystems.systems.find((system: any) => system.name == new_subsystem_parent.value)?.children.push({name: new_subSystem.name, id: new_subSystem.id, color: new_subSystem.color, children: new_subSystem.children});
-    //     storeSystems.subsystems.push(new_subSystem.name);
-        
-    //     alert_success_new_subsystem.value = true;
-
-    //     var intervalId = setInterval(() => {
-    //         if (alert_success_new_subsystem.value == false) {
-    //             clearInterval(intervalId);
-    //             storeGraph.newParentDialog = false;
-    //         } else {
-    //             storeGraph.newParentDialog = false;
-    //             alert_success_new_subsystem.value = false;
-    //         }
-    //     }, 2000)
+    const data = {
+        "name": new_subsystem_name.value,            
+        "color": new_subsystem_color.value,
+        "SystemId": storeSystems.selected,
+        "history": 0,
+    };
+    await SubSystemService.post(data);
+    storeSystems.refreshSubSystems();
+    storeGraph.newParentDialog = false;
 }
 
 function editParent() {
@@ -1875,36 +1835,13 @@ function hideNodeHistory() {
     showHistoryDialog.value = false;
 }
 
+// Fix bug with history
 async function viewNodeHistory() {
-    // showHistoryDialog.value = true;
-    // component_history.length = 0;
-    // search.value = "";
-    // let record = await pocketbase.collection('components').getOne(selectedNodes.value[0]); 
-    // let parent = storeSystems.subSystemsFromDB.filter((item: any) => item.id == record.parent_system)[0].name;
-    // let user = (await pocketbase.collection('users').getOne(record.user)).username;
-    // let date = record.action_date.substring(0, 16);
-
-    // component_history.push({name: record.component_name, version: record.version, updated: date, parent: parent, action: record.action, user: user});
-   
-    // while (true) {
-
-    //     if (record.previous_state == "" || record.previous_state == null || record.previous_state == undefined) {
-    //         break;
-    //     }
-    //     if (record.action == "created") {
-    //         break;
-    //     }
-
-    //     record = await pocketbase.collection('components').getOne(record.previous_state); 
-    //     let parent =storeSystems.subSystemsFromDB.filter((item: any) => item.id == record.parent_system)[0].name;
-    //     let user = (await pocketbase.collection('users').getOne(record.user)).username;
-    //     let date = record.action_date.substring(0, 16);
-
-    //     component_history.push({name: record.component_name, version: record.version, updated: date, parent: parent, action: record.action, user: user});
-    //     if (record.previous_state == "" || record.previous_state == null || record.previous_state == undefined) {
-    //         break;
-    //     }
-    // }
+    showHistoryDialog.value = true;
+    component_history.length = 0;
+    search.value = "";
+    component_history = (await ComponentService.getHistory(selectedNodes.value[0])).data;
+    console.log(component_history);
 }
 
 async function addSubSystem() {

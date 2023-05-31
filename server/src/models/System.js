@@ -7,6 +7,7 @@ module.exports = (sequelize, DataTypes) => {
     });
     System.associate = function(models) {
         System.hasMany(models.Subsystem)
+        System.belongsToMany(models.User, {through: 'SystemsUsers'})
     }
 
     return System;
