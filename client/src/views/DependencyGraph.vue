@@ -104,7 +104,7 @@
                         Recenter
                     </v-btn>
                     <v-btn  v-on:click="{
-                        storeSystems.getLayouts(storeSystems.selected);
+                        storeSystems.getLayouts(storeSystems.selectedId);
                     }" class="toolbar_btn">
                         Reset Layout
                     </v-btn>
@@ -118,7 +118,7 @@
                     </v-btn>
                     <v-select
                     class="toolbar_systems_select"
-                    v-model="storeSystems.selected"
+                    v-model="storeSystems.selectedName"
                     :items="assigned_system_names"
                     label=""
                     variant="solo"
@@ -223,7 +223,7 @@
                                 </div>
                             
                                 </v-row>
-                                <!-- <v-row>
+                                <v-row>
                                     <v-label class="edit_label">Parent system</v-label>
                                     <v-select
                                         ref="parent_select"
@@ -231,7 +231,7 @@
                                         v-model="edit_parent"
                                         :items="storeSystems.subsystems"
                                     ></v-select>
-                                </v-row> -->
+                                </v-row>
                                 <v-row>
                                     <div class="edit_input">
                                         <v-label class="edit_label">Component Version</v-label>
@@ -1077,6 +1077,7 @@ import { VDataTable } from 'vuetify/labs/VDataTable'
 import SystemsService from "../services/SystemsService";
 import ComponentService from "../services/ComponentService";
 import SubSystemService from "../services/SubSystemService";
+import UserService from "../services/UserService";
 
 const nodes: Nodes = reactive({});
 const edges: Edges = reactive({});
@@ -1328,7 +1329,7 @@ if (storeComponents.refresh && storeComponents.lock == false) {
 if (storeSystems.refresh && storeSystems.lock == false) {
     storeSystems.loadSystems().then (() => {
         getAssignedSystemNames();
-        storeSystems.getLayouts(storeSystems.selected).then(() => {
+        storeSystems.getLayouts(storeSystems.selectedId).then(() => {
             graph?.value?.panToCenter();
             graph?.value?.fitToContents();
             loading.value = false;
@@ -1344,7 +1345,6 @@ if (storeSystems.refresh && storeSystems.lock == false) {
 if (storeDependencies.refresh && storeDependencies.lock == false) {
     storeDependencies.loadDependencies();
 }
-
 
 storeSystems.getLayouts(assigned_system_names[0]);
 // Alerts 
@@ -1384,10 +1384,11 @@ watch(
 
 // Update selected system when dropdown changes (The system the user is currently viewing)
 watch(
-    () => storeSystems.selected,
+    () => storeSystems.selectedName,
     () => {
         loading.value = true;
-        storeSystems.getLayouts(storeSystems.selected).then(() => {
+        storeSystems.selectedId = storeSystems.systems.filter((item: any) => item.name == storeSystems.selectedName)[0].id;
+        storeSystems.getLayouts(storeSystems.selectedId).then(() => {
             graph?.value?.panToCenter();
             graph?.value?.fitToContents();
             loading.value = false;
@@ -1495,7 +1496,7 @@ function showNodeContextMenu(params: vNG.NodeEvent<MouseEvent>) {
     edit_parent_id = sub_system[0]?.id;
     edit_parent_name.value = sub_system[0]?.name;
     edit_parent_color.value = sub_system[0]?.color;
-    edit_parent_parent.value = storeSystems.selected;
+    edit_parent_parent.value = storeSystems.selectedId;
     edit_parent_version.value = sub_system[0]?.version;
 
     const { node, event } = params
@@ -1759,7 +1760,7 @@ async function newSubSystem() {
     const data = {
         "name": new_subsystem_name.value,            
         "color": new_subsystem_color.value,
-        "SystemId": storeSystems.selected,
+        "SystemId": storeSystems.selectedId,
         "history": 0,
     };
     await SubSystemService.post(data);
@@ -1823,7 +1824,7 @@ async function deleteNodeConfirm () {
         await ComponentService.delete(selectedNodes.value[k]);
     }
     storeSystems.loadSystems().then(() => {
-        storeSystems.getLayouts(storeSystems.selected).then(() => {
+        storeSystems.getLayouts(storeSystems.selectedId).then(() => {
             graph?.value?.panToCenter();
             graph?.value?.fitToContents();
         })
@@ -1848,7 +1849,7 @@ async function addSubSystem() {
     storeGraph.newParentDialog = true;
     new_subsystem_name.value = "";
     new_subsystem_color.value = "#428971";
-    new_subsystem_parent.value = storeSystems.selected;
+    new_subsystem_parent.value = storeSystems.selectedId;
 }
 
 function addExistingSubSystem() {
@@ -1923,7 +1924,7 @@ async function saveNewSystem() {
 async function saveNew() {
 
     // // Find parent system id from name
-    let system_index = storeSystems.systems.findIndex((system: any) => system.id == storeSystems.selected);
+    let system_index = storeSystems.systems.findIndex((system: any) => system.id == storeSystems.selectedId);
     let subsystem_index = storeSystems.systems[system_index].subsystems.findIndex((subsystem: any) => subsystem.name == new_component_parent.value);
     let parent_id = storeSystems.systems[system_index].subsystems[subsystem_index].id;
 
@@ -1965,19 +1966,12 @@ async function deleteDependency() {
     // }
 }
 async function getAssignedSystemNames() {
-    // let system_ids = pocketbase.authStore.model?.assigned_systems;
-    // assigned_system_names.length = 0;
-    // for (let i = 0; i < system_ids.length; i++) {
-    //     let index = storeSystems?.systems?.findIndex((item: any) => item.id == system_ids[i])
-    //     if (index == -1) {
-    //         continue;
-    //     }
-    //     const system_name = storeSystems.systems[index].name;
-    //     assigned_system_names[i] = system_name;
-    // }
-    // if (storeSystems.selected == "") {
-    //    storeSystems.selected = assigned_system_names[0];
-    // }
+    let assigned_ids = (await UserService.getAssignedSystems(storeUser.id)).data;
+    for (let i = 0; i < assigned_ids.length; i++) {
+        let system_index = storeSystems.systems.findIndex((system: any) => system.id == assigned_ids[i]);
+        assigned_system_names[i] = storeSystems.systems[system_index].name;
+    }
+    console.log(assigned_system_names);
 }
 
 function getAssignedSubSystemNames() {

@@ -12,7 +12,8 @@ export const useSystemsStore = defineStore({
   state: () => ({
     systems: [] as any[],
     subsystems: [] as string[],
-    selected: "" as string,
+    selectedId: "" as string,
+    selectedName: "" as string,
     layouts: reactive({}) as Layouts,
     nodes: reactive({}) as Nodes,
     componentsFromDB: [] as any[],
@@ -48,7 +49,8 @@ export const useSystemsStore = defineStore({
         
       this.subSystemsFromDB = (await SubSystemService.index("")).data;
       this.componentsFromDB = (await SubSystemService.index("")).data;
-      this.selected = this.systems[0].id;
+      this.selectedId = this.systems[0].id;
+      this.selectedName = this.systems[0].name;
 
       this.getLayouts(this.systems[0].id);
 
@@ -65,6 +67,7 @@ export const useSystemsStore = defineStore({
       for (let i = 0; i < this.systems.length; i++) {
         this.systems[i].subsystems = (await SystemsService.getChildren(this.systems[i].id)).data;
       }
+
       this.subSystemsFromDB = (await SubSystemService.index("")).data;
       this.getSubSystemNames(this.systems[0].id);
     },
@@ -130,7 +133,7 @@ export const useSystemsStore = defineStore({
       this.nodes = nodes;
     },
     makeMultiLine(label: string) {
-      let lineLength = 10;
+      let lineLength = 12;
       let lineChar = 0;
       for (let i = 0; i < label.length; i++) {
         lineChar++;
