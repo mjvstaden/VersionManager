@@ -163,9 +163,9 @@
                 class="tooltip"
                 :style="{ ...tooltipPos, opacity: tooltipOpacity }"
                 >
-                <div class="tooltip-info"><strong>Name: </strong>{{ (storeComponents.components.filter((item) => item.id == (targetNodeId))[0]?.name) ?? ""  }}</div>
-                <div class="tooltip-info"><strong>Sub-System: </strong>{{ (storeComponents.components.filter((item) => item.id == (targetNodeId))[0]?.parent_name) ?? ""   }}</div>
-                <div class="tooltip-info"><strong>Version: </strong>{{ (storeComponents.components.filter((item) => item.id == (targetNodeId))[0]?.version) ?? "" }}</div>
+                <div class="tooltip-info"><strong>Name: </strong>{{ component_name  }}</div>
+                <div class="tooltip-info"><strong>Sub-System: </strong>{{ component_subsystem }}</div>
+                <div class="tooltip-info"><strong>Version: </strong>{{ component_version }}</div>
                 <div class="tooltip-info" style="font-size: 10px;"> (right click to edit)</div>
                 </div>
                 <template>
@@ -1305,6 +1305,12 @@ import { useUserStore } from "../stores/user.js";
 import { useSystemsStore } from "../stores/systems";
 import axios from "axios";
 
+const userStore = useUserStore();
+
+if (userStore.valid == false) {
+    router.push("/login");
+}
+
 
 let search = ref("");
 let loading = ref(true);
@@ -1381,7 +1387,6 @@ watch(
         add_existing_subsystem.value = "";
     }
 )
-
 // Update selected system when dropdown changes (The system the user is currently viewing)
 watch(
     () => storeSystems.selectedName,
@@ -1402,6 +1407,7 @@ watch(
         if (!graph.value || !tooltip.value) return
     // translate coordinates: SVG -> DOM
         const domPoint = graph.value.translateFromSvgToDomCoordinates(targetNodePos.value)
+       
     // calculates top-left position of the tooltip.
         tooltipPos.value = {
         left: domPoint.x - tooltip.value.offsetWidth / 2 + "px",
@@ -1413,6 +1419,11 @@ watch(
 
 const dialog_new = ref(false);
 const dialog_new_system = ref(false);
+
+// Component Hover 
+let component_name = ref("");
+let component_subsystem = ref("");
+let component_version = ref("");
 
 // Edit component dialog
 let edit_id: string = "";
@@ -1452,6 +1463,7 @@ let dialogDeleteNodes = ref(false);
 let subSystemWithSameNameDialog = ref(false);
 
 function showContextMenu(element: HTMLElement, event: MouseEvent) {
+
   element.style.left = event.x + "px"
   element.style.top = event.y + "px"
   element.style.visibility = "visible"
@@ -1489,14 +1501,15 @@ function showNodeContextMenu(params: vNG.NodeEvent<MouseEvent>) {
     } else 
         edit_version.value = "";
 
-    edit_parent.value = record[0]?.parent_name;
+    let parent_id = record[0]?.SubsystemId;
+    const sub_system = storeSystems.subSystemsFromDB.filter((item: any) => item.id == parent_id);
+    edit_parent.value = sub_system[0]?.name;
 
-    const sub_system = storeSystems?.subSystemsFromDB.filter((item: any) => item.id == record[0]?.parent_id);
 
     edit_parent_id = sub_system[0]?.id;
     edit_parent_name.value = sub_system[0]?.name;
     edit_parent_color.value = sub_system[0]?.color;
-    edit_parent_parent.value = storeSystems.selectedId;
+    edit_parent_parent.value = storeSystems.selectedName;
     edit_parent_version.value = sub_system[0]?.version;
 
     const { node, event } = params
@@ -1536,6 +1549,13 @@ function continueWithSubSystem() {
     subSystemWithSameNameDialog.value = false;
     newSubSystem();
 }
+function getComponentInfo() {
+    let nodeId = targetNodeId.value;
+    let subSystemId = storeSystems.componentsFromDB.filter((item: any) => item.id == nodeId)[0].SubsystemId;
+    component_subsystem = storeSystems.subSystemsFromDB.filter((item: any) => item.id == subSystemId)[0]?.name ?? "";
+    component_name = storeSystems.componentsFromDB.filter((item: any) => item.id == nodeId)[0].name;
+    component_version = storeSystems.componentsFromDB.filter((item: any) => item.id == nodeId)[0].version;
+}
 
 const eventHandlers: vNG.EventHandlers = {
     "view:contextmenu": showViewContextMenu,
@@ -1543,6 +1563,7 @@ const eventHandlers: vNG.EventHandlers = {
     "node:pointerover": ({ node }) => {
         targetNodeId.value = node
         tooltipOpacity.value = 1 // show
+        getComponentInfo();
     },
     "node:pointerout": _ => {
         tooltipOpacity.value = 0 // hide

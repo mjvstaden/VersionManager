@@ -64,8 +64,8 @@
             nav
           >
              <div class="user_info" style="display: flex; flex-direction: column;">
-                <v-label style="margin-top: 5px; margin-bottom: 0px;">{{pocketbase.authStore.model?.username}}</v-label>
-                <v-label style="font-size: 12px;"> {{pocketbase.authStore.model?.role}}</v-label>
+                <v-label style="margin-top: 5px; margin-bottom: 0px;">{{userStore.name}}</v-label>
+                <v-label style="font-size: 12px;"> {{userStore.role}}</v-label>
             </div>
             <template v-slot:append>
               <v-btn
@@ -82,7 +82,7 @@
             <v-list-item prepend-icon="mdi-home-city" title="Dashboard" value="home" @click="$router.push('/dashboard')"></v-list-item>
             <v-list-item prepend-icon="mdi-graph" title="View" value="view" @click="$router.push('/view')"></v-list-item>
             <!-- <v-list-item prepend-icon="mdi-plus" title="Create" value="create" @click="$router.push('/create')"></v-list-item> -->
-            <v-list-item prepend-icon="mdi-history" title="History" value="history" @click="$router.push('/history')" v-if="pocketbase.authStore.model?.role !== 'SIT'"></v-list-item>
+            <v-list-item prepend-icon="mdi-history" title="History" value="history" @click="$router.push('/history')" v-if="userStore.role !== 'SIT'"></v-list-item>
           </v-list>
 
           <v-list density="compact" style="position: absolute; bottom: 0px; width: 100%;" nav >
@@ -195,32 +195,18 @@
             }
         },
         methods: {
-            logout() {
-                pocketbase.authStore.clear();
-                
-                this.$pinia.state.value.systems.selected = "";
-                // this.$pinia.state.value.components.refresh = true;
-                // this.$pinia.state.value.subSystems.refresh = true;
-                // this.$pinia.state.value.dependencies.refresh = true;
-                this.$router.push('/login');
-            }
+            ...mapActions(useUserStore, ['logout'])
         }
     }
 </script>
 
 <script setup lang="ts">
-import { pocketbase } from '../lib/pocketbase';
-import { useComponentStore } from "../stores/components.js";
-import { useSubSystemsStore } from "../stores/subSystems.js";
-import { useDependencyStore } from "../stores/dependencies.js";
-import { useGraphStore } from "../stores/graph.js";
-import { useSystemsStore } from "../stores/systems";
 
-const systemsStore = useSystemsStore();
-const componentsStore = useComponentStore();
-const subSystemsStore = useSubSystemsStore();
-const dependenciesStore = useDependencyStore();
-const graphStore = useGraphStore();
+import { mapActions } from 'pinia';
+import { useUserStore } from '../stores/user';
+
+const userStore = useUserStore();
+
 
 </script>
   

@@ -48,8 +48,14 @@ import router from "../router";
 
 <script setup lang="ts">
 import { useSystemsStore } from "../stores/systems";
+import { useUserStore } from "../stores/user";
 
 const systemStore = useSystemsStore();
+const userStore = useUserStore();
+
+if (userStore.valid == false) {
+    router.push("/login");
+}
 
 systemStore.loadSystems();
 

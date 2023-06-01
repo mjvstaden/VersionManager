@@ -1,5 +1,6 @@
 import { defineStore } from "pinia";
 import { useLocalStorage } from "@vueuse/core";
+import router from "../router";
 
 export const useUserStore = defineStore({
     id: 'user',
@@ -21,6 +22,15 @@ export const useUserStore = defineStore({
             this.name = user.username;
             this.email = user.email;
             this.role = user.role;
+        },
+        logout() {
+            this.valid = false;
+            this.id = '';
+            this.name = '';
+            this.email = '';
+            this.role = '';
+            this.token = '';
+            router.push('/login');
         }
     }
 });

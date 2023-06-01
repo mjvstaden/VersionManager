@@ -48,7 +48,7 @@ export const useSystemsStore = defineStore({
       }
         
       this.subSystemsFromDB = (await SubSystemService.index("")).data;
-      this.componentsFromDB = (await SubSystemService.index("")).data;
+      this.componentsFromDB = (await ComponentService.index("")).data;
       this.selectedId = this.systems[0].id;
       this.selectedName = this.systems[0].name;
 
