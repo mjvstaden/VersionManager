@@ -8,6 +8,7 @@ function getUpdatedComponent(component_old, component_new) {
         history: false,
         previous_state: component_old.id,
         SubsystemId: null,
+        action: component_new.action
     }
 
     if (component_new.name === undefined || component_new.name === null) {

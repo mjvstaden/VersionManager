@@ -31,6 +31,7 @@ module.exports = {
   
   async put(req, res, next) {
     const schema = Joi.object({
+      id: Joi.number().integer().min(1).required(),
       name: Joi.string().required(),
       version: Joi.string(),
       history: Joi.number(),
@@ -42,6 +43,7 @@ module.exports = {
       const value = await schema.validateAsync(req.body);
       next();
     } catch (error) {
+      console.log(error);
       switch (error.details[0].context.key) {
         case 'name':
           res.status(400).send({

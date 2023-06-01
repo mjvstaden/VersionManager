@@ -1843,8 +1843,6 @@ async function deleteNodeConfirm () {
             // Delete subsystem
             await SubSystemService.delete(component.SubsystemId);
         }
-
-
     }
     storeSystems.loadSystems().then(() => {
         storeSystems.getLayouts(storeSystems.selectedId).then(() => {
@@ -1886,6 +1884,8 @@ function addExistingSubSystem() {
 }
 
 async function saveNewSystem() {
+
+
     // if (new_system_name.value.trim().length <= 3) {
     //     alert_system_name.value = true;
     //     console.log("System name must be at least 3 characters long");
@@ -2023,233 +2023,39 @@ function getDate() {
 }
 
 async function save() {
-//     const record = await pocketbase.collection('components').getOne(edit_id);   
-   
-//     let system_index = storeSystems.systems.findIndex((system: any) => system.name == storeSystems.selected);
-//     let sub_index = storeSystems.systems[system_index].children.findIndex((subsystem: any) => subsystem.name == edit_parent.value);
-//     let parent_system_id = storeSystems.systems[system_index].children[sub_index].id;
+    const record = storeSystems.componentsFromDB.find((component: any) => component.id == edit_id && component.history == 0);
+    let system_index = storeSystems.systems.findIndex((system: any) => system.id == storeSystems.selectedId);
+    let edit_subsystem_id = storeSystems.systems[system_index].subsystems.find((subsystem: any) => subsystem.name == edit_parent.value).id;
 
-//     if (edit_name.value == record.component_name && edit_version.value == record.version && parent_system_id == record.parent_system) {
-//         closeInfo();
-//         return;
-//     }
+    if (record) {
+        if (record.name == edit_name.value && record.version == edit_version.value && record.SubsystemId == edit_subsystem_id) {
+            closeInfo();
+            return
+        }   
+    }
 
-//     // Set history = true
-//     const data_update = {
-//     "history": true,
-//     "previous_state": record.previous_state,
-//     "user": pocketbase.authStore.model?.id,
-//     "action": record.action,
-//     "action_date": record.action_date,
-//     };
+    const data = {
+        "id": edit_id,
+        "name": edit_name.value,
+        "SubsystemId": edit_subsystem_id,
+        "version": edit_version.value,
+        "history": 0,
+        "action": "edited"
+    }
 
-//     // request to update database record
-//     const updated_record = await pocketbase.collection('components').update(edit_id, data_update);
+    try {
+        await ComponentService.put(data);
 
+    } catch (error) {
+        // console.log(error);
+    }
 
-//     // Data to create new component
-//     const data = {
-//         "component_name": edit_name.value,
-//         "parent_system": parent_system_id,
-//         "version": edit_version.value,
-//         "history": false,
-//         "previous_state": updated_record.id,
-//         "user": pocketbase.authStore.model?.id,
-//         "action": "edited",
-//         "action_date": getDate(),
-//     };
+    storeSystems.loadSystems().then(() => {
+        graph?.value?.panToCenter();
+        graph?.value?.fitToContents();
+    });
 
-//     // create new component
-//     const new_record = await pocketbase.collection('components').create(data);
-//     storeComponents.refresh = true;
-//     // console.log("old id: " + edit_id)
-//     // console.log("new id ",new_record.id)
-
-
-//     // Update local components store 
-//     let index = storeComponents.components.findIndex((item: any) => item.id == updated_record.id)
-//     // console.log("updated record id: " + updated_record.id)
-//     // console.log("index: " + index)
-//     storeComponents.components[index].id = new_record.id;
-//     storeComponents.components[index].name = edit_name.value;
-//     storeComponents.components[index].parent_name = edit_parent.value;
-//     storeComponents.components[index].version = edit_version.value;
-
-//     storeComponents.components[index].color = storeSystems.systems.find((item: any) => item.name == storeSystems.selected)?.children.find((item: any) => item.id == new_record.parent_system)?.color || "#000000";
-
-//     storeSystems.componentsFromDB.find((item: any) => item.id == updated_record.id)[0] = updated_record;
-//     storeSystems.componentsFromDB.push(new_record);
-
-//     // Update dependencies with new component id
-//     const dependencies = await pocketbase.collection('dependencies').getFullList({filter: `source = "${edit_id}" || target = "${edit_id}"`});
-//     dependencies.forEach(async (dependency: any) => {
-//         if (dependency.source == edit_id) {
-//             const data = {
-//                 "source": new_record.id,
-//                 "target": dependency.target,
-//                 "faulty": dependency.faulty,
-//             }
-//             await pocketbase.collection('dependencies').update(dependency.id, data);
-//         } else {
-//             const data = {
-//                 "source": dependency.source,
-//                 "target": new_record.id,
-//                 "faulty": dependency.faulty,
-//             }
-//             await pocketbase.collection('dependencies').update(dependency.id, data);
-//         }
-//     });
-//     // Update dependencies locally in pinia store 
-//     storeDependencies.dependencies.forEach((edge: any) => {
-//         if (edge.source == edit_id) {
-//             edge.source = new_record.id;
-//         } else if (edge.target == edit_id) {
-//             edge.target = new_record.id;
-//         }
-//     });
-//     storeDependencies.populateEdges();
-
-//     const parent_original = await pocketbase.collection('sub_systems').getOne(record.parent_system);
-//    // parent_system_id = parent_original.id;
-
-//     if (edit_name.value.length > 0 && edit_name.value.length <= 3) {
-//         alertName = true;
-//         return;
-//     } else 
-//         alertName = false;
-
-//     if (edit_name.value.length == 0) {
-//         edit_name = record.component_name
-//     }
-
-//     // if parent system didn't change 
-//     // console.log("record.parent_system = " + record.parent_system)
-//     // console.log("new_record.parent_system = " + new_record.parent_system)
-//     if (record.parent_system === new_record.parent_system) {
-//         console.log("parent system didn't change")
-//         let new_children: {id: string, name: string}[] = [];
-//         let index = parent_original.children.findIndex((item: any) => item == updated_record.id);
-//         parent_original.children[index] = new_record.id;
-        
-//         const parent_data = {
-//             "name": parent_original.name,
-//             "children": parent_original.children,
-//         }
-
-//         await pocketbase.collection('sub_systems').update(parent_original.id, parent_data)
-//         storeSystems.subSystemsFromDB.find((item: any) => item.id == parent_original.id).children = parent_original.children;
-
-//         index = 0;
-//         for (let i = 0; i < parent_original.children.length; i++) {
-//             const child = storeComponents.components[storeComponents.components.findIndex((item: any) => item.id == parent_original.children[i])];
-//             if (child != undefined) {
-//                 new_children[index] = {id: child.id, name: child.name};
-//                 index++;
-//             }
-//         }
-
-//         // Update local pinia store
-//         let system_index = storeSystems.systems.findIndex((item: any) => item.name == storeSystems.selected);
-//         // console.log("system_index = " + system_index)
-//         let subsystem_index = storeSystems.systems[system_index].children.findIndex((item: any) => item.id == parent_original.id);
-//         // console.log("parent_original.id = " + parent_original.id)
-//         // console.log("subsystem_index = " + subsystem_index)
-//         storeSystems.systems[system_index].children[subsystem_index].children = new_children;
-
-//         for (let i = 0; i < storeComponents.components.length; i++) {
-//             if (storeComponents.components[i].id == updated_record.id) {
-//                 storeComponents.components[i].id = new_record.id;
-//                 storeComponents.components[i].name = edit_name.value;
-//                 storeComponents.components[i].parent_name = parent_original.name;
-//                 storeComponents.components[i].version = edit_version?.value || "";
-//                 storeComponents.components[i].color = parent_original.color;
-//             }
-//         }
-//         storeSystems.getLayouts(storeSystems.selected);
-
-//     } else { // if parent system changed
-//         // console.log("Parent system changed")
-//         // Remove from current system
-//         let new_children: {id: string, name: string}[] = [];
-//         let children_ids = parent_original.children.filter((item: any) => item !== updated_record.id);
-//         index = 0;
-//         for (let i = 0; i < children_ids.length; i++) {
-//             // const child = await pocketbase.collection("components").getOne(children_ids[i]);
-//             const child = storeComponents.components[storeComponents.components.findIndex((item: any) => item.id == children_ids[i])];
-//             if (child != undefined) {
-//                 new_children[index] = {id: child.id, name: child.name};
-//                 index++;
-//             }
-//         }
-        
-//         const parent_data = {
-//             "name": parent_original.name,
-//             "children": children_ids,
-//         }
-//         // console.log("Parent data: ", parent_data)
-//         const updated_original = await pocketbase.collection('sub_systems').update(parent_original.id, parent_data).then(() => {
-//             // Update local pinia store
-//             storeSystems.subSystemsFromDB.find((item: any) => item.id == parent_original.id).children = children_ids;
-//             let system_index = storeSystems.systems.findIndex((item: any) => item.name == storeSystems.selected);
-//             let subsystem_index = storeSystems.systems[system_index].children.findIndex((item: any) => item.id == parent_original.id);
-//             storeSystems.systems[system_index].children[subsystem_index].children = new_children;
-//         });
-
-//         // Add to new system 
-//         const new_component_parent_system = storeSystems.subSystemsFromDB[storeSystems.subSystemsFromDB.findIndex((item: any) => item.name == edit_parent.value && item.history == false)];
-
-//         children_ids = [];
-//         new_children = [];
-//         children_ids = new_component_parent_system.children.concat(new_record.id);
-//         parent_system_id = new_component_parent_system.id;
-//         index = 0;
-//         for (let i = 0; i < children_ids.length; i++) {
-//             const child = storeComponents.components[storeComponents.components.findIndex((item: any) => item.id == children_ids[i])];
-//             if (child != undefined) {
-//                 new_children[index] = {id: child.id, name: child.name};
-//                 index++;
-//             }
-//         }
-//         const new_component_parent_data = {
-//             "name": new_component_parent_system.name,
-//             "children": children_ids,
-//         }
-//         const updated_parent = await pocketbase.collection('sub_systems').update(new_component_parent_system.id, new_component_parent_data);
-
-//         // Update local pinia store
-//         storeSystems.subSystemsFromDB.find((item: any) => item.id == new_component_parent_system.id).children = children_ids;
-//         let system_index = storeSystems.systems.findIndex((item: any) => item.name == storeSystems.selected);
-//         // console.log("System index: ", system_index);
-
-//         let subsystem_index = storeSystems.systems[system_index].children.findIndex((item: any) => item.id == new_component_parent_system.id);
-//         // console.log("new_component_parent_system.id: ", new_component_parent_system.id);
-//         // console.log("Subsystem index: ", subsystem_index);
-       
-//         storeSystems.systems[system_index].children[subsystem_index].children = new_children;
-    
-
-//         storeSubSystems.refresh = true;
-
-//         // Update Pinia store
-//         const parent_db = await pocketbase.collection('sub_systems').getOne(parent_system_id);
-
-//         for (let i = 0; i < storeComponents.components.length; i++) {
-//             if (storeComponents.components[i].id == updated_record.id) {
-//                 storeComponents.components[i].id = new_record.id;
-//                 storeComponents.components[i].name = edit_name.value;
-//                 storeComponents.components[i].parent_name = parent_db.name;
-//                 storeComponents.components[i].version = edit_version?.value || "";
-//                 storeComponents.components[i].color = new_component_parent_system.color;
-//             }
-//         }  
-//     }
-//     storeSystems.getLayouts(storeSystems.selected).then(() => {
-//         let system_index = storeSystems.systems.findIndex((item: any) => item.name == storeSystems.selected);
-//         let subsystem_index = storeSystems.systems[system_index].children.findIndex((item: any) => item.id == parent_system_id);
-//         storeSystems.nodes[new_record.id].color = storeSystems.systems[system_index].children[subsystem_index].color;
-//     });
-//     storeSubSystems.refresh = true;
-//     closeInfo()
+    closeInfo()
 }
 
 function handleEnter() {
