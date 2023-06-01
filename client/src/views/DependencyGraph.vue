@@ -1078,6 +1078,7 @@ import SystemsService from "../services/SystemsService";
 import ComponentService from "../services/ComponentService";
 import SubSystemService from "../services/SubSystemService";
 import UserService from "../services/UserService";
+import DependencyService from "../services/DependencyService";
 
 const nodes: Nodes = reactive({});
 const edges: Edges = reactive({});
@@ -1249,12 +1250,14 @@ export default {
                     this.$pinia.state.value.dependencies.dependencies[index].faulty = false;
 
                     // Update the database 
-                    const data = {
+                    const dependency = {
+                        id: this.$pinia.state.value.dependencies.edges[selectedEdges.value[i]].id,
                         source: this.$pinia.state.value.dependencies.edges[selectedEdges.value[i]].source,
                         target: this.$pinia.state.value.dependencies.edges[selectedEdges.value[i]].target,
                         faulty: false,
                     }
-                    // const record = await pocketbase.collection('dependencies').update(this.$pinia.state.value.dependencies.edges[selectedEdges.value[i]].id, data);
+
+                    const record = (await DependencyService.put(dependency))
                     this.$pinia.state.value.dependencies.refresh = true;
                     // alert("Status changed to working!")
 
@@ -1267,12 +1270,13 @@ export default {
                     this.$pinia.state.value.dependencies.dependencies[index].faulty = true;
 
                     // Update the database 
-                    const data = {
+                    const dependency = {
+                        id: this.$pinia.state.value.dependencies.edges[selectedEdges.value[i]].id,
                         source: this.$pinia.state.value.dependencies.edges[selectedEdges.value[i]].source,
                         target: this.$pinia.state.value.dependencies.edges[selectedEdges.value[i]].target,
                         faulty: true,
                     }
-                    // const record = await pocketbase.collection('dependencies').update(this.$pinia.state.value.dependencies.edges[selectedEdges.value[i]].id, data);
+                    const record = (await DependencyService.put(dependency))
                     this.$pinia.state.value.dependencies.refresh = true;
                 }
             }
@@ -1582,27 +1586,34 @@ function addSystem() {
 }
 
 async function addDependency() {  
-    // // const records = await pocketbase.collection('dependencies').getFullList({filter: `source = "${selectedNodes.value[0]}" && target = "${selectedNodes.value[1]}"`}); 
+    let records = null as any;
+    try {
+        records = (await DependencyService.show(selectedNodes.value[0], selectedNodes.value[1]));
+    }
+    catch (error) {
+        // console.log(error);
+    }
 
-    // // Check if dependency already exists
-    // if (records.length > 0) {
-    //     alert("Dependency already exists!")
-    //     return;
-    // }
-    // const data = {
-    //     source: selectedNodes.value[0],
-    //     target: selectedNodes.value[1],
-    //     faulty: false,
-    // }
-    // // delete from database
-    // // const record = await pocketbase.collection('dependencies').create(data);
+    if (records != null && records.data.length > 0) {
+        alert("Dependency already exists");
+        return;
+    } else {
+        const data = {
+            source: selectedNodes.value[0],
+            target: selectedNodes.value[1],
+            faulty: false,
+        }
 
-    // // Update local pinia store
-    // storeDependencies.addDependency({id: record.id, target: data.target, source: data.source, faulty: false});
-    // storeDependencies.populateEdges();
-    // storeDependencies.refresh = true;
-    // selectedEdges.value = [];
+        // // const record = await pocketbase.collection('dependencies').create(data);
+        const record = (await DependencyService.post(data)).data;
+        console.log(record);
 
+        // Update local pinia store
+        storeDependencies.addDependency({id: record.id, target: data.target, source: data.source, faulty: false});
+        storeDependencies.populateEdges();
+        storeDependencies.refresh = true;
+        selectedEdges.value = [];
+    }
 }
 async function saveSubSystem() {
 

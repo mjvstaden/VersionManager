@@ -1,12 +1,13 @@
 import { defineStore, PiniaCustomStateProperties } from 'pinia';
 import { Edges } from 'v-network-graph';
 import { reactive } from 'vue';
+import DependencyService from '../services/DependencyService';
 // import { pocketbase } from '../lib/pocketbase';
 
 export const useDependencyStore = defineStore({
   id: 'dependencies',
   state: () => ({
-    dependencies: [] as {id: String, target: string, source: string, faulty: boolean }[],
+    dependencies: [] as any[],
     edges: reactive({}) as Edges,
     nr_issues: 0 as number,
     refresh: true as boolean,
@@ -17,21 +18,21 @@ export const useDependencyStore = defineStore({
   },
   actions: {
     async loadDependencies() {
-        // this.lock = true;
-        // pocketbase.autoCancellation(false);
+        console.log('loadDependencies');
+        this.lock = true;
 
-        // this.dependencies = [];
+        this.dependencies = [];
 
-        // const records = (await pocketbase.collection('dependencies').getFullList());
-        // this.nr_issues =  (await pocketbase.collection('dependencies').getFullList({ filter: 'faulty = true' })).length;
+        const records = (await DependencyService.index('')).data;
+        console.log("Records: ", records);
 
-        // for (let i = 0; i < records.length; i++) {   
-        //     this.addDependency({id: records[i].id, target: records[i].target, source:  records[i].source, faulty: records[i].faulty});
-        // }    
+        for (let i = 0; i < records.length; i++) {   
+            this.addDependency({id: records[i].id, target: records[i].target, source:  records[i].source, faulty: records[i].faulty});
+        }    
 
-        // this.populateEdges();
-        // this.refresh = false;
-        // this.lock = false;
+        this.populateEdges();
+        this.refresh = false;
+        this.lock = false;
     },
     addDependency(dependency: {id: string, target: string, source: string, faulty: boolean }) {
       this.dependencies.push(dependency);
