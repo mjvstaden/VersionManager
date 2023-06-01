@@ -6,17 +6,7 @@ module.exports = {
       let dependencies = null
       const search = req.query.search
       if (search) {
-        dependencies = await Dependency.findAll({
-          where: {
-            $or: [
-              'name', 
-            ].map(key => ({
-              [key]: {
-                $like: `%${search}%`
-              }
-            }))
-          }
-        })
+        dependencies = await Dependency.findAll()
       } else {
         dependencies = await Dependency.findAll()
       }
@@ -29,7 +19,12 @@ module.exports = {
   },
   async show (req, res) {
     try {
-      const dependency = await Dependency.findByPk(req.params.dependencyId)
+      const dependency = await Dependency.findAll({
+        where: {
+          source: req.params.sourceId,
+          target: req.params.targetId
+        }
+      })
       res.send(dependency)
     } catch (err) {
       res.status(500).send({
