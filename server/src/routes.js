@@ -79,7 +79,7 @@ module.exports = function(app) {
     //     DependencyController.indexActive)
     app.get('/dependencies/:sourceId/:targetId',
         DependencyController.show)
-    app.put('/dependencies/:dependenciesId',
+    app.put('/dependencies/:dependencyId',
         DependencyControllerPolicy.put,
         DependencyController.put)
     app.post('/dependencies',

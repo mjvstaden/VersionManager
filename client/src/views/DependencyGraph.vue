@@ -1252,9 +1252,9 @@ export default {
                     // Update the database 
                     const dependency = {
                         id: this.$pinia.state.value.dependencies.edges[selectedEdges.value[i]].id,
-                        source: this.$pinia.state.value.dependencies.edges[selectedEdges.value[i]].source,
-                        target: this.$pinia.state.value.dependencies.edges[selectedEdges.value[i]].target,
-                        faulty: false,
+                        // source: this.$pinia.state.value.dependencies.edges[selectedEdges.value[i]].source,
+                        // target: this.$pinia.state.value.dependencies.edges[selectedEdges.value[i]].target,
+                        faulty: 0,
                     }
 
                     const record = (await DependencyService.put(dependency))
@@ -1272,9 +1272,9 @@ export default {
                     // Update the database 
                     const dependency = {
                         id: this.$pinia.state.value.dependencies.edges[selectedEdges.value[i]].id,
-                        source: this.$pinia.state.value.dependencies.edges[selectedEdges.value[i]].source,
-                        target: this.$pinia.state.value.dependencies.edges[selectedEdges.value[i]].target,
-                        faulty: true,
+                        // source: this.$pinia.state.value.dependencies.edges[selectedEdges.value[i]].source,
+                        // target: this.$pinia.state.value.dependencies.edges[selectedEdges.value[i]].target,
+                        faulty: 1,
                     }
                     const record = (await DependencyService.put(dependency))
                     this.$pinia.state.value.dependencies.refresh = true;
@@ -2004,7 +2004,6 @@ async function getAssignedSystemNames() {
         let system_index = storeSystems.systems.findIndex((system: any) => system.id == assigned_ids[i]);
         assigned_system_names[i] = storeSystems.systems[system_index].name;
     }
-    console.log(assigned_system_names);
 }
 
 function getAssignedSubSystemNames() {

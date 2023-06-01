@@ -43,13 +43,14 @@ module.exports = {
     }
   },
   async put (req, res) {
+    console.log(req.params.dependencyId)
     try {
       await Dependency.update(req.body, {
         where: {
           id: req.params.dependencyId
         }
       })
-      res.send(req.body)
+      res.send("Successfully updated dependency")
     } catch (err) {
       res.status(500).send({
         error: 'an error has occured trying to update the dependency'

@@ -29,9 +29,8 @@ module.exports = {
   
   async put(req, res, next) {
     const schema = Joi.object({
-      source: Joi.number().integer().min(1).required(),
-      target: Joi.number().integer().min(1).required(),
-      faulty: Joi.boolean().required()
+      id: Joi.number().integer().min(1).required(),
+      faulty: Joi.number().integer().min(0).max(1).required()
     });
 
     try {
@@ -39,14 +38,14 @@ module.exports = {
       next();
     } catch (error) {
       switch (error.details[0].context.key) {
-        case 'source':
+        case 'id':
           res.status(400).send({
             error: 'You must provide a vaild component id for the dependency soure.'
           });
           break;
-        case 'target':
+        case 'faulty':
           res.status(400).send({
-            error: `You must provide a valid component id for the dependency target.`
+            error: `You must provide a valid status for the dependency.`
           });
           break;
       }
