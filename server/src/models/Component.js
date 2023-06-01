@@ -4,6 +4,7 @@ module.exports = (sequelize, DataTypes) => {
         version: DataTypes.STRING,
         history: DataTypes.BOOLEAN,
         previous_state: DataTypes.INTEGER,
+        action: DataTypes.STRING,
     });
 
     Component.associate = function(models) {

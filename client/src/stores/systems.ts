@@ -49,12 +49,13 @@ export const useSystemsStore = defineStore({
         
       this.subSystemsFromDB = (await SubSystemService.index("")).data;
       this.componentsFromDB = (await ComponentService.index("")).data;
-      this.selectedId = this.systems[0].id;
-      this.selectedName = this.systems[0].name;
+      if (this.selectedId == "") {
+        this.selectedId = this.systems[0].id;
+        this.selectedName = this.systems[0].name;
+      }
 
-      this.getLayouts(this.systems[0].id);
-
-      this.getSubSystemNames(this.systems[0].id);
+      this.getLayouts(this.selectedId);
+      this.getSubSystemNames(this.selectedId);
       this.getSystemNames();
 
       this.refresh = false;

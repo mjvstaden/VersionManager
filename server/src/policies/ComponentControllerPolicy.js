@@ -6,7 +6,8 @@ module.exports = {
       name: Joi.string().required(),
       version: Joi.string(),
       history: Joi.number(),
-      SubsystemId: Joi.number().integer().min(1).required()
+      SubsystemId: Joi.number().integer().min(1).required(),
+      action: Joi.string(),
     });
     try {
       const value = await schema.validateAsync(req.body);
@@ -33,7 +34,8 @@ module.exports = {
       name: Joi.string().required(),
       version: Joi.string(),
       history: Joi.number(),
-      SubsystemId: Joi.number().integer().min(1)
+      SubsystemId: Joi.number().integer().min(1),
+      action: Joi.string(),
     });
 
     try {

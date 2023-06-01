@@ -857,7 +857,8 @@
                 v-on:keyup.esc="handleEsc"
                 >
                     <v-card>
-                        <v-card-title v-if="selectedNodes.length > 1" class="text-h5">Are you sure you want to delete all {{ selectedNodes.length }} components?</v-card-title>
+                        <v-card-title v-if="selectedNodes.length > 2" class="text-h5">Are you sure you want to delete all {{ selectedNodes.length }} components?</v-card-title>
+                        <v-card-title v-if="selectedNodes.length == 2" class="text-h5">Are you sure you want to delete both components?</v-card-title>
                         <v-card-title v-if="selectedNodes.length == 1" class="text-h5">Are you sure you want to delete this component?</v-card-title>
                         <v-card-actions>
                         <v-spacer></v-spacer>
@@ -1320,7 +1321,7 @@ let search = ref("");
 let loading = ref(true);
 let showHistoryDialog = ref(false);
 const graph = ref<vNG.Instance>()
-let component_history: {name: string, parent: string, version: string, updated: string, user: string, action: string}[] = reactive([]);
+const component_history: {name: string, parent: string, version: string, updated: string, user: string, action: string}[] = reactive([]);
 let subSystem_history: {name: string, parent: string, color: string, version: string, updated: string, user: string, action: string}[] = reactive([]);
 const assigned_system_names: string[] = reactive([]);
 const assigned_subSystem_names: string[] = reactive([]);
@@ -1398,6 +1399,7 @@ watch(
         loading.value = true;
         storeSystems.selectedId = storeSystems.systems.filter((item: any) => item.name == storeSystems.selectedName)[0].id;
         storeSystems.getLayouts(storeSystems.selectedId).then(() => {
+            storeSystems.getSubSystemNames(storeSystems.selectedId);
             graph?.value?.panToCenter();
             graph?.value?.fitToContents();
             loading.value = false;
@@ -1717,63 +1719,44 @@ async function saveSubSystem() {
 }
 
 async function saveAddExistingSubSystem() {
-    // let system_id = storeSystems.systems.find((system: any) => system.name == add_existing_system.value)?.id;
-    // let subsystem = storeSystems.subSystemsFromDB.find((subsystem: any) => subsystem.name == add_existing_subsystem.value && subsystem.parent[0] == system_id && subsystem.history == false) ?? null;
-    
+    let system_id = storeSystems.systems.find((system: any) => system.name == add_existing_system.value)?.id;
+
+    let subsystem = storeSystems.subSystemsFromDB.find((subsystem: any) => subsystem.name == add_existing_subsystem.value && subsystem.SystemId == system_id && subsystem.history == false) ?? null;
+    console.log(subsystem);
     // if (subsystem != null) {
-    //     let children = subsystem.children;
-    //     let selected_system_id = storeSystems.systems.find((system: any) => system.name == storeSystems.selected)?.id;
-        
-    //     const subsystem_data = {
-    //         "name": subsystem.name,
-    //         "children": [],
-    //         "color": subsystem.color,
-    //         "parent": [selected_system_id],
-    //         "previous_state": subsystem.id,
-    //         "user": pocketbase.authStore.model?.id,
-    //         "history": false,
-    //         "action": "imported from " + add_existing_system.value + " to " + storeSystems.selected,
-    //     }
-    //     const new_subsystem = await pocketbase.collection('sub_systems').create(subsystem_data);
-        
-    //     let children_ids = [];
-    //     // iterate through children array
-    //     for (let i = 0; i < children.length; i++) {
-    //         // Find component
-    //         let component = storeSystems.componentsFromDB.find((component: any) => component.id == children[i]) ?? null;
-    //             if (component != null) {
-    //                 const data = {
-    //                     "component_name": component.component_name,
-    //                     "parent_system": new_subsystem.id,
-    //                     "version": component.version,
-    //                     "history": false,
-    //                     "previous_state": component.id,
-    //                     "user": pocketbase.authStore.model?.id,
-    //                     "action": "imported from " + add_existing_system.value + " from " + subsystem.name,
-    //                     "action_date": getDate(),
-    //                 }
-    //                 const new_component = await pocketbase.collection('components').create(data);
-    //                 children_ids.push(new_component.id);
-    //                 storeSystems.componentsFromDB.push(new_component);
-    //                 storeComponents.addComponent({id: new_component.id, name: new_component.component_name, parent_name: new_subsystem.name, parent_id: new_component.parent_system, version: new_component.version, color: new_subsystem.color});
-    //         }
-    //     }
-    //     const updated_new_subsystem = await pocketbase.collection('sub_systems').update(new_subsystem.id, {"children": children_ids});
+    let children = (await SubSystemService.getChildren(subsystem.id)).data;
+    
+    const subsystem_data = {
+        "name": subsystem.name + " (import)",
+        "color": subsystem.color,
+        "SystemId": storeSystems.selectedId,
+        "version": subsystem.version,
+        "history": 0,
+        // "action": "imported from " + add_existing_system.value + " to " + storeSystems.selectedId,
+    }
+    const new_subsystem = await SubSystemService.post(subsystem_data);
 
-    //     // update store with children 
-    //     storeSystems.systems.find((system: any) => system.id == selected_system_id)?.children.push({children: updated_new_subsystem.children, id: updated_new_subsystem.id, name: updated_new_subsystem.name, color: updated_new_subsystem.color});
-    //     storeSystems.subSystemsFromDB.push(updated_new_subsystem);
-
-    //     let system_children = storeSystems.systems.find((system: any) => system.id == selected_system_id)?.children.map((child: any) => child.id);
-    //     if (selected_system_id != undefined) {
-    //         const updated_system = await pocketbase.collection('systems').update(selected_system_id, {"children": system_children});
-    //     }
-    // }
-    // storeSystems.getLayouts(storeSystems.selected).then(() => {
-    //     graph?.value?.panToCenter();
-    //     graph?.value?.fitToContents();
-    // })
-    // storeGraph.showAddExistingSubSystemDialog = false;
+    // iterate through children array
+    for (let i = 0; i < children.length; i++) {
+        // Find component
+        let component = storeSystems.componentsFromDB.find((component: any) => component.id == children[i].id) ?? null;
+        console.log(component);
+        if (component != null) {
+            const data = {
+                "name": component.name,
+                "SubsystemId": new_subsystem.data.id,
+                "version": component.version,
+                "history": 0,
+                "action": "imported from " + add_existing_system.value + " to " + storeSystems.selectedName,
+            }
+            const new_component = await ComponentService.post(data);
+        }
+    }
+    storeSystems.loadSystems().then(() => {
+        graph?.value?.panToCenter();
+        graph?.value?.fitToContents()
+    });
+    storeGraph.showAddExistingSubSystemDialog = false;
 }
 
 const alert_success_new_subsystem = ref(false);
@@ -1851,9 +1834,17 @@ async function deleteNodeConfirm () {
 
     for (let k = 0; k < selectedNodes.value.length; k++) {
         // Get component
-        const record = (await ComponentService.show(selectedNodes.value[k])).data;
+        const component = (await ComponentService.show(selectedNodes.value[k])).data;
         // Delete component
         await ComponentService.delete(selectedNodes.value[k]);
+        // Get subsystem children
+        const children = (await SubSystemService.getChildren(component.SubsystemId)).data;
+        if (children.length == 0) {
+            // Delete subsystem
+            await SubSystemService.delete(component.SubsystemId);
+        }
+
+
     }
     storeSystems.loadSystems().then(() => {
         storeSystems.getLayouts(storeSystems.selectedId).then(() => {
@@ -1873,8 +1864,14 @@ async function viewNodeHistory() {
     showHistoryDialog.value = true;
     component_history.length = 0;
     search.value = "";
-    component_history = (await ComponentService.getHistory(selectedNodes.value[0])).data;
-    console.log(component_history);
+
+    let history_data = (await ComponentService.getHistory(selectedNodes.value[0])).data;
+    console.log(history_data);
+    for (let i = 0; i < history_data.length; i++) {
+        let subsystem = storeSystems.subSystemsFromDB.find((subsystem: any) => subsystem.id == history_data[i].SubsystemId);
+        let updatedAt = history_data[i].updatedAt.substring(0, 10) + " " + history_data[i].updatedAt.substring(11, 16);
+        component_history[i] = ({name: history_data[i].name, version: history_data[i].version, updated: updatedAt, parent: subsystem.name, action: history_data[i].action, user: "user"});
+    }
 }
 
 async function addSubSystem() {
@@ -1960,14 +1957,12 @@ async function saveNew() {
     let subsystem_index = storeSystems.systems[system_index].subsystems.findIndex((subsystem: any) => subsystem.name == new_component_parent.value);
     let parent_id = storeSystems.systems[system_index].subsystems[subsystem_index].id;
 
-    // const parent = await pocketbase.collection('sub_systems').getOne(parent_id);
-    const subsystem = await SystemsService.show(parent_id)
-
     const data = {
         "name": new_component_name.value,
-        "SubsystemId": subsystem.data.id,
+        "SubsystemId": parent_id,
         "version": new_component_version.value,
         "history": 0,
+        "action": "created"
     }
 
     try {
@@ -2006,11 +2001,16 @@ async function getAssignedSystemNames() {
     }
 }
 
-function getAssignedSubSystemNames() {
+async function getAssignedSubSystemNames() {
     assigned_subSystem_names.length = 0;
-    let system_index = storeSystems.systems.findIndex((system: any) => system.name == add_existing_system.value);
-    for (let i = 0; i < storeSystems.systems[system_index].children.length; i++) {
-        assigned_subSystem_names[i] = storeSystems.systems[system_index].children[i].name;
+    assigned_subSystem_names.length = 0;
+
+    let system_id = storeSystems.systems.find((system: any) => system.name == add_existing_system.value).id;
+
+    const children = (await SystemsService.getChildren(system_id)).data;
+    
+    for (let i = 0; i < children.length; i++) {
+        assigned_subSystem_names[i] = children[i].name;
     }
 }
 
