@@ -1983,19 +1983,20 @@ async function saveNew() {
 
 async function deleteDependency() {
 
-    // if (confirm("Are you sure you want to delete this dependency?")) {
-    //     let id = storeDependencies.edges[selectedEdges.value[0]].id;
-    //     // Delete from database 
-    //     const record = await pocketbase.collection('dependencies').delete(id); 
-        
-    //     // Update local pinia store
-    //     storeDependencies.remove(id);
-    //     storeDependencies.populateEdges();
-    //     storeDependencies.refresh = true;
+    if (confirm("Are you sure you want to delete this dependency?")) {
+        let id = storeDependencies.edges[selectedEdges.value[0]].id;
 
-    //     // Clear selected edges
-    //     selectedEdges.value = [];
-    // }
+        // Delete from database 
+        const record = await DependencyService.delete(id); 
+        
+        // Update local pinia store
+        storeDependencies.remove(id);
+        storeDependencies.populateEdges();
+        storeDependencies.refresh = true;
+
+        // Clear selected edges
+        selectedEdges.value = [];
+    }
 }
 async function getAssignedSystemNames() {
     let assigned_ids = (await UserService.getAssignedSystems(storeUser.id)).data;

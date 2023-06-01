@@ -44,7 +44,7 @@ module.exports = {
   },
   async put (req, res) {
     try {
-      await dependency.update(req.body, {
+      await Dependency.update(req.body, {
         where: {
           id: req.params.dependencyId
         }
@@ -53,6 +53,20 @@ module.exports = {
     } catch (err) {
       res.status(500).send({
         error: 'an error has occured trying to update the dependency'
+      })
+    }
+  },
+  async delete (req, res) {
+    try {
+      await Dependency.destroy({
+        where: {
+          id: req.params.dependencyId
+        }
+      })
+      res.send("Successfully deleted dependency")
+    } catch (err) {
+      res.status(500).send({
+        error: 'an error has occured trying to delete the dependency'
       })
     }
   }

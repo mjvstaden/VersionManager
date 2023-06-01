@@ -24,7 +24,7 @@ export default {
     put (dependency: any) {
         return Api().put(`dependencies/${dependency.id}`, dependency)
     },
-    delete (dependency_id: string) {
-        return Api().put(`dependencies/delete/${dependency_id}`)
+    delete (dependencyId: string) {
+        return Api().delete(`dependencies/${dependencyId}`)
     },
 }

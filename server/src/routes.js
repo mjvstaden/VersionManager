@@ -85,4 +85,6 @@ module.exports = function(app) {
     app.post('/dependencies',
         DependencyControllerPolicy.post,
         DependencyController.post)
+    app.delete('/dependencies/:dependencyId',
+        DependencyController.delete)
 }
