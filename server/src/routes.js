@@ -73,9 +73,11 @@ module.exports = function(app) {
     app.put('/components/delete/:componentId',
         ComponentController.delete)
 
-    app.get('/dependencies',
+    app.get('/dependencies/all',
         DependencyController.index)
-    app.get('/dependencies/:dependenciesId',
+    // app.get('/dependencies/active',
+    //     DependencyController.indexActive)
+    app.get('/dependencies/:sourceId/:targetId',
         DependencyController.show)
     app.put('/dependencies/:dependenciesId',
         DependencyControllerPolicy.put,
