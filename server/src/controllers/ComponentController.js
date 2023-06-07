@@ -1,5 +1,6 @@
-const { where } = require('sequelize')
+const { Op } = require('sequelize')
 const {Component} = require('../models')
+const {Dependency} = require('../models')
 
 function getUpdatedComponent(component_old, component_new) {
     const updated_component = {
@@ -30,6 +31,42 @@ function getUpdatedComponent(component_old, component_new) {
     }
 
     return updated_component
+}
+
+async function updateDependencies(component_old, component_updated) {
+  const dependencies = await Dependency.findAll({
+    where: {
+      [Op.or]: [
+      {source: component_old.id},
+      {target: component_old.id}
+      ]
+    }
+  })
+  console.log("Dependencies: ", dependencies)
+
+  for (let i = 0; i < dependencies.length; i++) {
+    if (dependencies[i].source === component_old.id) {
+      dependencies[i].source = component_updated.id
+    } else {
+      dependencies[i].target = component_updated.id
+    }
+  }
+
+  for (let i = 0; i < dependencies.length; i++) {
+    console.log("Updated dependency: ", dependencies[i])
+    console.log("Updated dependency id: ", dependencies[i].id)
+    try {
+      const update = await Dependency.update({source: dependencies[i].source, target: dependencies[i].target}, {
+        where: {
+          id: dependencies[i].id
+        }
+      })
+      console.log("Update: ", update)
+    }
+    catch (err) {
+      console.log(err)
+    }
+}
 }
 
 module.exports = {
@@ -161,7 +198,14 @@ module.exports = {
       const component_old = await Component.findByPk(req.params.componentId)
       const component_new = req.body
       const updated_component = getUpdatedComponent(component_old, component_new)
+      
       const component = await Component.create(updated_component)
+      .then(component => {
+        updateDependencies(component_old, component)
+      })
+      .catch(err => {
+        console.log(err)
+      })
       await Component.update({history: true}, {
           where: {
           id: req.params.componentId

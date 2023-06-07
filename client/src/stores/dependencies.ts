@@ -2,7 +2,6 @@ import { defineStore, PiniaCustomStateProperties } from 'pinia';
 import { Edges } from 'v-network-graph';
 import { reactive } from 'vue';
 import DependencyService from '../services/DependencyService';
-// import { pocketbase } from '../lib/pocketbase';
 
 export const useDependencyStore = defineStore({
   id: 'dependencies',
@@ -18,13 +17,11 @@ export const useDependencyStore = defineStore({
   },
   actions: {
     async loadDependencies() {
-        console.log('loadDependencies');
         this.lock = true;
 
         this.dependencies = [];
 
         const records = (await DependencyService.index('')).data;
-        console.log("Records: ", records);
 
         for (let i = 0; i < records.length; i++) {   
             this.addDependency({id: records[i].id, target: records[i].target, source:  records[i].source, faulty: records[i].faulty});

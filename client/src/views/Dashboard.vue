@@ -10,9 +10,9 @@
                 <link href="https://cdn.jsdelivr.net/npm/@mdi/font@5.x/css/materialdesignicons.min.css" rel="stylesheet">
 
                 <div class="dashboard-container">
-                    <!-- <DashboardCard icon="error" :number= storeDependencies.nr_issues  message="Known dependency issues" ></DashboardCard>
-                    <DashboardCard icon="update" :number=storeComponents.nr_edited message="Components updated in the last 7 days"></DashboardCard>
-                    <DashboardCard icon="added" :number=storeComponents.nr_new message="New components added in the last 7 days"></DashboardCard> -->
+                    <DashboardCard icon="error" :number=1  message="Known dependency issues" ></DashboardCard>
+                    <DashboardCard icon="update" :number=1 message="Components updated in the last 7 days"></DashboardCard>
+                    <DashboardCard icon="added" :number=1 message="New components added in the last 7 days"></DashboardCard>
                 </div>
             </div>
         </div>

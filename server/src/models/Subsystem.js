@@ -5,6 +5,7 @@ module.exports = (sequelize, DataTypes) => {
         history: DataTypes.BOOLEAN,
         previous_state: DataTypes.INTEGER,
         color: DataTypes.STRING,
+        action: DataTypes.STRING
     }, {
         timestamps: true, 
     });

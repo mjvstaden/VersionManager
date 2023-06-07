@@ -19,7 +19,6 @@ export default {
         return Api().get(`components/${component_id}`)
     },
     post (component: any) {
-        console.log("ComponentService.post", component);
         return Api().post(`components`, component)
     },
     put (component: any) {

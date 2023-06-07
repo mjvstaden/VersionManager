@@ -8,6 +8,8 @@ function getUpdatedSubSystem(subsystem_old, subsystem_new) {
       history: false,
       previous_state: subsystem_old.id,
       SystemId: null,
+      color: subsystem_new.color,
+      action: subsystem_new.action
   }
 
   if (subsystem_new.name === undefined || subsystem_new.name === null) {
@@ -32,12 +34,12 @@ function getUpdatedSubSystem(subsystem_old, subsystem_new) {
 }
 
 async function getChildren (subsystem) {
-  // console.log("Subsystem", subsystem)
   const children = await Component.findAll({
     where: {
       SubsystemId: subsystem.previous_state,
       history: false
-    }
+    },
+    order: ['name']
   })
   return children
 }
@@ -54,10 +56,9 @@ async function deleteChildren (subsystem_id) {
   });
 }
 
-async function updateComponentIds(subsystem) {
+async function updateComponentsSubsystemIds(subsystem) {
   try {
     const children = await getChildren(subsystem);
-    // console.log("Children", children);
     children.forEach(async (child) => {
       await child.update({ SubsystemId: subsystem.id });
     });
@@ -144,11 +145,13 @@ module.exports = {
         where: {
           SubsystemId: req.params.subsystemId,
           history: false
-        }
+        },
+        order: ['name']
       })
       res.send(children)
     }
     catch (err) {
+      console.log(err)
       res.status(500).send({
         error: 'an error has occured trying to fetch the sub-system children'
       })
@@ -211,7 +214,7 @@ module.exports = {
       const subsystem_new = req.body
       const updated_subsystem = getUpdatedSubSystem(subsystem_old, subsystem_new)
       const subsystem = await Subsystem.create(updated_subsystem)
-      updateComponentIds(subsystem)
+      updateComponentsSubsystemIds(subsystem)
       await Subsystem.update({history: true}, {
           where: {
           id: req.params.subsystemId

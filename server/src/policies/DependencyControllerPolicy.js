@@ -37,6 +37,7 @@ module.exports = {
       const value = await schema.validateAsync(req.body);
       next();
     } catch (error) {
+      console.log(error)
       switch (error.details[0].context.key) {
         case 'id':
           res.status(400).send({
