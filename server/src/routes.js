@@ -11,6 +11,7 @@ const SubSystemControllerPolicy = require("./policies/SubSystemControllerPolicy"
 const SystemControllerPolicy = require("./policies/SystemControllerPolicy")
 const DependencyControllerPolicy = require("./policies/DependencyControllerPolicy")
 const UserController = require("./controllers/UserController")
+const UserSystemsController = require("./controllers/UserSystemsController")
 
 module.exports = function(app) {
     app.post('/register', 
@@ -22,7 +23,11 @@ module.exports = function(app) {
         AuthenticationController.index)
     app.get('/users/systems/:userId',
         UserController.getAssignedSystems)
-    
+    app.get('/users/:role',     
+        UserController.getUsersByRole)
+
+    app.post('/usersystems', 
+        UserSystemsController.bulkCreate)   
 
     app.get('/systems',
         SystemController.index)

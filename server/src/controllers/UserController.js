@@ -1,4 +1,5 @@
 const {UserSystems} = require('../models')
+const {User} = require('../models')
 
 module.exports = {
     async getAssignedSystems (req, res) {
@@ -25,4 +26,18 @@ module.exports = {
             })
         }
     },
+    async getUsersByRole (req, res) {
+        try {
+            const users = await User.findAll({
+                where: {
+                  role: req.params.role,
+                }
+              })
+              res.send(users)
+        } catch (err) {
+            res.status(500).send({
+                error: 'an error has occured trying to fetch the users'
+            })
+        }
+    }
 }

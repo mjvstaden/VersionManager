@@ -1,9 +1,9 @@
 [
     {
-    "email": "mj.vanstaden@vastech.co.za",
-    "username": "mjvs",
-    "role": "Developer",
-    "password": "12345678"
+        "email": "mj.vanstaden@vastech.co.za",
+        "username": "mjvs",
+        "role": "Developer",
+        "password": "12345678"
     },
     {
         "email": "support@gmail.com",

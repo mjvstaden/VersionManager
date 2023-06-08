@@ -9,13 +9,7 @@
         <div class="graph-right">
             <!-- Toolbar -->
             <div class="top-section">
-            <div class="toolbar"> 
-                <!-- <div class="toolbar__left">
-                    <div class="toolbar__left__title">
-                        Edges:
-                    </div>
-                </div> -->
-               
+            <div class="toolbar">
 
                 <div class="toolbar_edges">
                     <v-label class="toolbar_nodes_label" style="margin-left: 0px;">Edges: </v-label>
@@ -61,9 +55,6 @@
 
                 <div class="toolbar_nodes">
                     <v-label class="toolbar_nodes_label" style="margin-left: 20px;">Nodes: </v-label>
-                    <!-- <v-btn v-on:click="editNode" class="toolbar_btn" :disabled="selectedNodes.length == 0">
-                        Edit Component
-                    </v-btn> -->
                     <v-btn v-on:click="addNode" class="toolbar_btn">
                         Add New
                     </v-btn>
@@ -246,15 +237,7 @@
                             </v-card-text>
 
                             <v-card-actions>
-                                
-                            <!-- <v-btn
-                            style="margin-left: 10px;"
-                                color="blue darken"
-                                variant="text"
-                                @click="closeInfo"
-                            >
-                                back
-                            </v-btn> -->
+
                             <v-btn
                             style="margin-right: 0px; margin-left: 10px;"
                                 icon="mdi-history"
@@ -294,7 +277,7 @@
                                 icon="mdi-content-save"
                                 color="blue-darken-1"
                                 variant="text"
-                                @click="save"
+                                @click="saveEditedComponent"
                             >
                             <v-tooltip
                                 activator="parent"
@@ -496,15 +479,6 @@
                                 </div>
                             
                                 </v-row>
-                                <!-- <v-row>
-                                    <v-label class="edit_label">Parent System</v-label>
-                                    <v-select
-                                        ref="parent_select"
-                                        class="parent_select"
-                                        v-model="edit_parent_parent"
-                                        :items="assigned_system_names"
-                                    ></v-select>
-                                </v-row> -->
                                 <v-row>
                                     <div class="edit_input">
                                         <v-label class="edit_label">Sub-System Version</v-label>
@@ -524,12 +498,6 @@
                                         mode="hex"
                                         ></v-color-picker>
                                         </div>
-                                    <!-- <div class="edit_input">
-                                        <v-label class="edit_label">Color </v-label>
-                                        <v-text-field
-                                            v-model="edit_parent_color"
-                                        ></v-text-field>
-                                    </div> -->
 
                                 </v-row>
                             </v-container>
@@ -537,14 +505,6 @@
 
                             <v-card-actions>
                                 
-                            <!-- <v-btn
-                            style="margin-left: 10px;"
-                                color="blue darken"
-                                variant="text"
-                                @click="closeInfo"
-                            >
-                                back
-                            </v-btn> -->
                             <v-btn
                             icon="mdi-arrow-left"
                             style="margin-right: 20px; margin-left: 0px;"
@@ -620,12 +580,6 @@
                                 v-model="alert_success_new_subsystem"
                                 text="Sub-System added successfully."
                             ></v-alert>
-                            <!-- <v-alert
-                                color="warning"
-                                title="Softeware info"
-                                v-model=""
-                                text="Please make sure the software info you entered is at least 4 characters or leave field empty to keep it unchanged."
-                            ></v-alert> -->
 
                             <v-card-title style="display: flex; justify-content: space-between; align-items: center;">
                             <span 
@@ -722,12 +676,6 @@
                                 v-model="alert_success_new_subsystem"
                                 text="Subsystem created successfully."
                             ></v-alert>
-                            <!-- <v-alert
-                                color="warning"
-                                title="Softeware info"
-                                v-model=""
-                                text="Please make sure the software info you entered is at least 4 characters or leave field empty to keep it unchanged."
-                            ></v-alert> -->
 
                             <v-card-title style="display: flex; justify-content: space-between; align-items: center;">
                             <span 
@@ -763,15 +711,7 @@
                                 </div>
                             
                                 </v-row>
-                                <!-- <v-row>
-                                    <v-label class="edit_label">Parent System</v-label>
-                                    <v-select
-                                        ref="parent_select"
-                                        class="parent_select"
-                                        v-model="new_subsystem_parent"
-                                        :items="storeSystems.systemNames"
-                                        ></v-select>
-                                </v-row> -->
+
                                 <v-row>
                                 <div class="edit_input">
                                     <v-label class="edit_label">Sub-System Version</v-label>
@@ -792,13 +732,6 @@
                                         mode="hex"
                                         ></v-color-picker>
                                     </div>
-                                    <!-- <div class="edit_input">
-                                        <v-label class="edit_label">Color </v-label>
-                                        <v-text-field
-                                            placeholder="hex color code (e.g. #ff0000))"
-                                            v-model="new_subsystem_color"
-                                        ></v-text-field>
-                                    </div> -->
 
                                 </v-row>
                             </v-container>
@@ -1078,6 +1011,7 @@ import { VDataTable } from 'vuetify/labs/VDataTable'
 import SystemsService from "../services/SystemsService";
 import ComponentService from "../services/ComponentService";
 import SubSystemService from "../services/SubSystemService";
+import UserSystemsService from "../services/UserSystemsService";
 import UserService from "../services/UserService";
 import DependencyService from "../services/DependencyService";
 
@@ -1298,20 +1232,16 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { useComponentStore } from "../stores/components.js";
-import { useSubSystemsStore } from "../stores/subSystems.js";
 import { useDependencyStore } from "../stores/dependencies.js";
 import { useGraphStore } from "../stores/graph.js";
 import { useUserStore } from "../stores/user.js";
 import { useSystemsStore } from "../stores/systems";
-import axios from "axios";
 
 const userStore = useUserStore();
 
 if (userStore.valid == false) {
     router.push("/login");
 }
-
 
 let search = ref("");
 let loading = ref(true);
@@ -1322,16 +1252,10 @@ let subSystem_history: {name: string, parent: string, color: string, version: st
 const assigned_system_names: string[] = reactive([]);
 const assigned_subSystem_names: string[] = reactive([]);
 
-const storeComponents = useComponentStore();
-const storeSubSystems = useSubSystemsStore();
 const storeDependencies = useDependencyStore();
 const storeGraph = useGraphStore();
 const storeSystems = useSystemsStore();
 const storeUser = useUserStore();
-
-if (storeComponents.refresh && storeComponents.lock == false) {
-    storeComponents.loadComponents();
-}
 
 if (storeSystems.refresh && storeSystems.lock == false) {
     storeSystems.loadSystems().then (() => {
@@ -1355,11 +1279,9 @@ if (storeDependencies.refresh && storeDependencies.lock == false) {
 
 storeSystems.getLayouts(assigned_system_names[0]);
 // Alerts 
-let alertName = false;
-let alertSoftware = false;
+
 let alert_subsystem_name = ref(false);
 let alert_system_name = ref(false);
-let alert_system_success = ref(false);
 
 const tooltip = ref<HTMLDivElement>()
 
@@ -1409,7 +1331,6 @@ watch(
         if (!graph.value || !tooltip.value) return
     // translate coordinates: SVG -> DOM
         const domPoint = graph.value.translateFromSvgToDomCoordinates(targetNodePos.value)
-       
     // calculates top-left position of the tooltip.
         tooltipPos.value = {
         left: domPoint.x - tooltip.value.offsetWidth / 2 + "px",
@@ -1508,6 +1429,7 @@ function showNodeContextMenu(params: vNG.NodeEvent<MouseEvent>) {
     edit_parent.value = sub_system[0]?.name;
 
 
+    // Set component info in info dialog
     edit_parent_id = sub_system[0]?.id;
     edit_parent_name.value = sub_system[0]?.name;
     edit_parent_color.value = sub_system[0]?.color;
@@ -1602,7 +1524,6 @@ async function addDependency() {
             faulty: false,
         }
 
-        // // const record = await pocketbase.collection('dependencies').create(data);
         const record = (await DependencyService.post(data)).data;
         console.log(record);
 
@@ -1639,9 +1560,8 @@ async function saveSubSystem() {
         "history": 0,
         "action": "edited"
     };
-    console.log(new_sub_data);
     const new_sub_system = (await SubSystemService.put(new_sub_data)).data;
-    console.log(new_sub_system);
+    await SubSystemService.delete(subSystem.id);
     storeSystems.loadSystems().then(() => {
         graph?.value?.panToCenter()
         graph?.value?.fitToContents();
@@ -1801,8 +1721,6 @@ function addExistingSubSystem() {
 }
 
 async function saveNewSystem() {
-
-
     if (new_system_name.value.trim().length <= 3) {
         alert_system_name.value = true;
         console.log("System name must be at least 3 characters long");
@@ -1814,61 +1732,49 @@ async function saveNewSystem() {
         "name": new_system_name.value,
     };
 
-    // const new_system = await pocketbase.collection('systems').create(data);
-    // console.log(new_system);
-    // // this.$pinia.state.value.sub_systems.refresh = true;
+    const new_system = (await SystemsService.post(data)).data;
 
-    // alert_system_success.value = true;
-    // var intervalId = setInterval(() => {
-    //     if (alert_system_success.value == false) {
-    //         clearInterval(intervalId);
-    //     } else {
-    //         alert_system_success.value = false;
-    //     }
-    // }, 3000)
+    let userSystems: { UserId: any; SystemId: any; }[] = [];
 
-    // if (developer.value) {
-    //     const users = await pocketbase.collection('users').getFullList({
-    //         filter: 'role = "Developer"'
-    //     });
-    //     users.forEach(element => {
-    //         element.assigned_systems.push(new_system.id);
-    //         pocketbase.collection('users').update(element.id, element);
-    //     });
-    // }
+    if (developer.value) {
+        const users = await UserService.getUsersByRole("Developer");
 
-    // if (support.value) {
-    //     const users = await pocketbase.collection('users').getFullList({
-    //         filter: `role = "Support"`,
-    //     });
-    //     users.forEach(element => {
-    //         element.assigned_systems.push(new_system.id);
-    //         pocketbase.collection('users').update(element.id, element);
-    //     });
+        users.data.forEach((element: any) => {
+            userSystems.push({UserId: element.id, SystemId: new_system.id});
+        });
+    }
 
-    // }
+    if (support.value) {
+        const users = await UserService.getUsersByRole("Support");
 
-    // if (sit.value) {
-    //     const users = await pocketbase.collection('users').getFullList({
-    //         filter: `role = "SIT"`
-    //     });
-    //     users.forEach(element => {
-    //         element.assigned_systems.push(new_system.id);
-    //         pocketbase.collection('users').update(element.id, element);
-    //     });
-    // }
-    // // storeSystems.addSystem(new_system.id, new_system.name);
-    // closeNewSystem();
-    // storeSystems.loadSystems().then(() => {
-    //     getAssignedSystemNames();
-    // });
-    
+        users.data.forEach((element: any) => {
+            userSystems.push({UserId: element.id, SystemId: new_system.id});
+        });
+    }
+
+    if (sit.value) {
+        const users = await UserService.getUsersByRole("SIT");
+
+        users.data.forEach((element: any) => {
+            userSystems.push({UserId: element.id, SystemId: new_system.id});
+        });
+    }
+
+    UserSystemsService.post(userSystems)
+    .then (async () => {
+        await storeSystems.loadSystems();
+        await storeSystems.getLayouts(storeSystems.selectedId);
+        graph?.value?.panToCenter();
+        graph?.value?.fitToContents();
+        getAssignedSystemNames();
+    })
+    closeNewSystem();
 }
 
 // Add new component
 async function saveNew() {
 
-    // // Find parent system id from name
+    // Find parent system id from name
     let system_index = storeSystems.systems.findIndex((system: any) => system.id == storeSystems.selectedId);
     let subsystem_index = storeSystems.systems[system_index].subsystems.findIndex((subsystem: any) => subsystem.name == new_component_parent.value);
     let parent_id = storeSystems.systems[system_index].subsystems[subsystem_index].id;
@@ -1930,15 +1836,7 @@ async function getAssignedSubSystemNames() {
     }
 }
 
-function getDate() {
-    let action_date = new Date();
-    action_date.setHours(action_date.getHours() + 2);
-    let date = action_date.toISOString();
-    date = date.replace('T', ' ');
-    return date;
-}
-
-async function save() {
+async function saveEditedComponent() {
     const record = storeSystems.componentsFromDB.find((component: any) => component.id == edit_id && component.history == 0);
     let system_index = storeSystems.systems.findIndex((system: any) => system.id == storeSystems.selectedId);
     let edit_subsystem_id = storeSystems.systems[system_index].subsystems.find((subsystem: any) => subsystem.name == edit_parent.value).id;
@@ -1975,11 +1873,6 @@ async function save() {
     closeInfo()
 }
 
-function handleEnter() {
-    if (dialogDelete) {
-        deleteNodeConfirm();
-    }
-}
 function handleEsc() {
     storeGraph.showInfoDialog = false;
     storeGraph.showAddExistingSubSystemDialog = false;
