@@ -1,7 +1,7 @@
 {
   "name": "server",
   "version": "1.0.0",
-  "description": "a node backend for vue version manager app",
+  "description": "A node backend for vue version manager app",
   "main": "index.js",
   "scripts": {
     "start": "node ./src/app.js",
