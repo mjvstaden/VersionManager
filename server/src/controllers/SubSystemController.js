@@ -169,7 +169,6 @@ module.exports = {
   },
   async delete (req, res) {
     try {
-      // const subsystem = await Subsystem.findByPk(req.params.subsystemId)
       await Subsystem.update({history: true}, {
         where: {
           id: req.params.subsystemId
@@ -207,7 +206,6 @@ module.exports = {
     }
     return res.send(history)
   },
-  // Implement history functionality 
   async put (req, res) {
     try {
       const subsystem_old = await Subsystem.findByPk(req.params.subsystemId)
