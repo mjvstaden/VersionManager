@@ -1,6 +1,15 @@
 # VersionManager-Nodejs
 A dependency tracking/visualisation web app that is built with a Vuejs frontend and Expressjs backend.
 
+# Install Dependencies 
+  # Frontend 
+  1. Go to client directory 
+  2. Run `npm install` 
+
+  # Backend
+  1. Go to server directory 
+  2. Run `npm install`
+
 # Frontend 
 1. Go to client directory 
 2. Run `npm run dev`
