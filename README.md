@@ -16,5 +16,5 @@ A dependency tracking/visualisation web app that is built with a Vuejs frontend 
 2. Run `npm start`
 
 # Seed Database 
-1. Go to server/seed directory 
-2. Run `node index.js`
+1. Go to server directory 
+2. Run `npm run seed`
