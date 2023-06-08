@@ -80,8 +80,6 @@ module.exports = function(app) {
 
     app.get('/dependencies/all',
         DependencyController.index)
-    // app.get('/dependencies/active',
-    //     DependencyController.indexActive)
     app.get('/dependencies/:sourceId/:targetId',
         DependencyController.show)
     app.put('/dependencies/:dependencyId',
