@@ -7,4 +7,4 @@ A dependency tracking/visualisation web app that is built with a Vuejs frontend 
 
 # Backend 
 1. Go to server directory 
-2. run `node src/app.js`
+2. Run `node src/app.js`
